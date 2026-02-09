@@ -1,45 +1,149 @@
+<!-- /cadastro/index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Cadastro - ConecTexxto</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../auth.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Criar conta | ConecTexxto</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+
+  <style>
+    .page-wrap{min-height:calc(100vh - 70px - 64px);display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+    .auth-card{width:100%;max-width:520px;background:#081426;border-radius:16px;padding:26px;box-shadow:0 10px 25px rgba(0,0,0,.35);}
+    .auth-title{font-size:26px;margin-bottom:6px;}
+    .auth-sub{opacity:.85;margin-bottom:18px;line-height:1.5;}
+    .grid{display:grid;grid-template-columns:1fr;gap:14px;}
+    @media(min-width:520px){.grid.two{grid-template-columns:1fr 1fr;}}
+    .field{display:flex;flex-direction:column;gap:8px;}
+    .field label{font-size:14px;opacity:.9;}
+    .field input,.field select{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(30,144,255,.35);background:#050B18;color:#F5F7FA;outline:none;}
+    .field input:focus,.field select:focus{border-color:#1E90FF;box-shadow:0 0 0 3px rgba(30,144,255,.15);}
+    .note{opacity:.85;font-size:13px;line-height:1.5;margin-top:8px;}
+    .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;}
+    .btn2{display:inline-block;padding:12px 16px;border-radius:10px;font-weight:600;text-decoration:none;border:none;cursor:pointer;}
+    .btn-primary{background:#1E90FF;color:#fff;}
+    .btn-outline{background:transparent;border:2px solid #1E90FF;color:#1E90FF;}
+    .btn-primary:hover{filter:brightness(.95);}
+    .btn-outline:hover{background:#1E90FF;color:#fff;}
+    .helper{margin-top:14px;opacity:.9;font-size:14px;}
+    .helper a{color:#1E90FF;text-decoration:none;font-weight:600;}
+    .helper a:hover{text-decoration:underline;}
+    .toast{margin-top:14px;padding:12px;border-radius:12px;background:rgba(255,255,255,.06);display:none;}
+    .toast.ok{border:1px solid rgba(0,200,120,.35);}
+    .toast.err{border:1px solid rgba(255,80,80,.35);}
+    .check{display:flex;gap:10px;align-items:flex-start;margin-top:10px;}
+    .check input{margin-top:4px;}
+  </style>
 </head>
+
 <body>
+  <header>
+    <div class="logo">Conec<span>Texxto</span></div>
+    <nav>
+      <a href="../">Início</a>
+      <a href="../login/" class="btn">Entrar</a>
+    </nav>
+  </header>
 
-<div class="auth-container">
-  <h1>Criar Conta</h1>
+  <main class="page-wrap">
+    <section class="auth-card">
+      <h1 class="auth-title">Criar conta</h1>
+      <p class="auth-sub">Preencha seus dados para entrar no ConecTexxto.</p>
 
-  <input type="text" id="nome" placeholder="Nome">
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="senha" placeholder="Senha">
+      <form id="formCadastro">
+        <div class="grid">
+          <div class="field">
+            <label for="nome">Nome completo</label>
+            <input id="nome" type="text" placeholder="Seu nome" required>
+          </div>
+        </div>
 
-  <button onclick="cadastrar()">Cadastrar</button>
+        <div class="grid two" style="margin-top:14px;">
+          <div class="field">
+            <label for="email">E-mail</label>
+            <input id="email" type="email" placeholder="seuemail@exemplo.com" required>
+          </div>
+          <div class="field">
+            <label for="telefone">Telefone (opcional)</label>
+            <input id="telefone" type="tel" placeholder="(00) 00000-0000" inputmode="tel">
+          </div>
+        </div>
 
-  <p>Já tem conta?
-    <a href="../login/">Entrar</a>
-  </p>
-</div>
+        <div class="grid two" style="margin-top:14px;">
+          <div class="field">
+            <label for="idade">Idade</label>
+            <input id="idade" type="number" min="0" max="120" placeholder="Ex: 18" required>
+          </div>
+          <div class="field">
+            <label for="senha">Senha</label>
+            <input id="senha" type="password" placeholder="Crie uma senha" required>
+          </div>
+        </div>
 
-<script>
-function cadastrar() {
-  const nome = document.getElementById("nome").value;
-  const email = document.getElementById("email").value;
-  const senha = document.getElementById("senha").value;
+        <div class="check">
+          <input id="termos" type="checkbox" required>
+          <label for="termos" class="note">
+            Li e aceito os termos. Menores de 13 anos terão restrições de interação (mensagens e comentários).
+          </label>
+        </div>
 
-  if (!nome || !email || !senha) {
-    alert("Preencha todos os campos");
-    return;
-  }
+        <div class="row">
+          <button class="btn2 btn-primary" type="submit">Cadastrar</button>
+          <a class="btn2 btn-outline" href="../">Voltar ao início</a>
+        </div>
 
-  const usuario = { nome, email, senha };
-  localStorage.setItem("usuarioConecTexxto", JSON.stringify(usuario));
+        <div class="helper">
+          Já tem conta? <a href="../login/">Entrar</a>
+        </div>
 
-  alert("Conta criada com sucesso!");
-  window.location.href = "../login/";
-}
-</script>
+        <div id="msg" class="toast"></div>
+      </form>
+    </section>
+  </main>
 
+  <footer>© 2026 ConecTexxto · Projeto em desenvolvimento</footer>
+
+  <script>
+    const form = document.getElementById('formCadastro');
+    const msg = document.getElementById('msg');
+
+    function show(type, text){
+      msg.className = 'toast ' + (type || '');
+      msg.textContent = text;
+      msg.style.display = 'block';
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const nome = document.getElementById('nome').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const telefone = document.getElementById('telefone').value.trim();
+      const idade = Number(document.getElementById('idade').value);
+      const senha = document.getElementById('senha').value;
+      const termos = document.getElementById('termos').checked;
+
+      if(!termos){
+        show('err', 'Você precisa aceitar os termos para continuar.');
+        return;
+      }
+
+      if(!nome || !email || !senha || !Number.isFinite(idade)){
+        show('err', 'Preencha os campos obrigatórios.');
+        return;
+      }
+
+      // regra básica: menor de 13 entra, mas com restrições (vamos aplicar depois no chat/feed)
+      const usuario = { nome, email, senha, telefone, idade, createdAt: Date.now() };
+
+      localStorage.setItem('usuarioConecTexxto', JSON.stringify(usuario));
+      localStorage.removeItem('usuarioLogado'); // garante que não fica logado automaticamente
+
+      show('ok', 'Cadastro concluído! Redirecionando para o login...');
+      setTimeout(() => window.location.href = '../login/', 750);
+    });
+  </script>
 </body>
 </html>
