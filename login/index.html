@@ -1,74 +1,71 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Login | ConecTexxto</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Login - ConecTexxto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- CSS principal do site -->
+  <!-- Fonte -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="../styles.css">
-
-  <!-- Ícones -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-<body class="auth-body">
+<body>
 
-  <div class="auth-container">
-    <div class="auth-card">
+  <!-- HEADER -->
+  <header>
+    <div class="logo">Conec<span>Texxto</span></div>
+    <nav>
+      <a href="../index.html">Início</a>
+      <a href="../cadastro/" class="btn">Cadastrar</a>
+    </nav>
+  </header>
 
-      <h1 class="auth-title">
-        <i class="fa-solid fa-user-lock"></i>
-        Entrar
-      </h1>
+  <!-- LOGIN -->
+  <section class="hero">
+    <h1>Entrar</h1>
+    <p>Acesse sua conta para continuar.</p>
 
-      <p class="auth-subtitle">
-        Acesse sua conta para continuar
-      </p>
+    <form class="card" id="formLogin" style="max-width:420px;margin:30px auto;">
+      <input type="email" id="email" placeholder="Email" required>
+      <br><br>
 
-      <form class="auth-form" onsubmit="login(event)">
-        <div class="input-group">
-          <i class="fa-solid fa-envelope"></i>
-          <input type="email" id="email" placeholder="Seu e-mail" required>
-        </div>
+      <input type="password" id="senha" placeholder="Senha" required>
+      <br><br>
 
-        <div class="input-group">
-          <i class="fa-solid fa-lock"></i>
-          <input type="password" id="password" placeholder="Sua senha" required>
-        </div>
+      <button type="submit" class="btn">Entrar</button>
+    </form>
+  </section>
 
-        <button type="submit" class="btn-auth">
-          Entrar
-        </button>
-      </form>
+  <!-- FOOTER -->
+  <footer>
+    © 2026 ConecTexxto · Projeto em desenvolvimento
+  </footer>
 
-      <div class="auth-footer">
-        <p>Ainda não tem conta?</p>
-        <a href="../cadastro/">Criar cadastro</a>
-      </div>
-
-      <div class="auth-back">
-        <a href="../index.html">
-          <i class="fa-solid fa-arrow-left"></i> Voltar ao site
-        </a>
-      </div>
-
-    </div>
-  </div>
-
+  <!-- SCRIPT -->
   <script>
-    function login(event) {
-      event.preventDefault();
+    document.getElementById("formLogin").addEventListener("submit", function(e) {
+      e.preventDefault();
 
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+      const email = document.getElementById("email").value;
+      const senha = document.getElementById("senha").value;
 
-      if (email && password) {
-        alert("Login realizado com sucesso! (simulação)");
-        // futuramente aqui entra o backend / banco
-      } else {
-        alert("Preencha todos os campos.");
+      const usuario = JSON.parse(localStorage.getItem("usuarioConecTexxto"));
+
+      if (!usuario) {
+        alert("Nenhum usuário cadastrado.");
+        return;
       }
-    }
+
+      if (email === usuario.email && senha === usuario.senha) {
+        alert("Login realizado com sucesso!");
+        // futuro: redirecionar para área logada
+        // window.location.href = "../painel/";
+      } else {
+        alert("Email ou senha incorretos.");
+      }
+    });
   </script>
 
 </body>
