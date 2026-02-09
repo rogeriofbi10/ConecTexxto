@@ -4,55 +4,68 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ConecTexxto – Conectando pessoas</title>
+
+  <!-- Fonte -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
-    body{background:#0A1A2F;color:#F5F7FA}
-    header{display:flex;justify-content:space-between;align-items:center;padding:20px;background:#081426;position:sticky;top:0}
-    .logo{font-size:26px;font-weight:700;letter-spacing:1px}
-    .logo span{color:#1E90FF}
-    nav a{margin-left:15px;text-decoration:none;color:#F5F7FA;font-weight:500}
-    nav a.btn{background:#1E90FF;padding:8px 14px;border-radius:8px}
-    .hero{padding:80px 20px;text-align:center}
-    .hero h1{font-size:40px;margin-bottom:15px}
-    .hero p{max-width:600px;margin:0 auto 30px;opacity:.9}
-    .hero .actions a{margin:8px;display:inline-block}
-    .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;padding:40px}
-    .card{background:#081426;padding:20px;border-radius:14px;transition:.3s}
-    .card:hover{transform:translateY(-5px)}
-    footer{text-align:center;padding:20px;font-size:14px;opacity:.7}
-    @media(max-width:600px){.hero h1{font-size:30px}}
-  </style>
-  <link rel="stylesheet" href="styles.css" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header>
-  <div class="logo">Conec<span>Texxto</span></div>
-  <nav>
-    <a href="#">Entrar</a>
-    <a href="#" class="btn">Criar Conta</a>
-    <a href="#">Visitante</a>
-  </nav>
-</header>
 
-<section class="hero">
-  <h1>Conecte ideias. Conecte pessoas.</h1>
-  <p>O ConectTexxto é uma nova rede social que valoriza interação real, segurança e recompensas por engajamento.</p>
-  <div class="actions">
-    <a class="btn" href="#">Começar agora</a>
-  </div>
-</section>
+  <!-- HEADER -->
+  <header>
+    <div class="logo">Conec<span>Texxto</span></div>
+    <nav>
+      <a href="index.html">Início</a>
+      <a href="login/login.html" class="btn">Entrar</a>
+      <a href="cadastro/cadastro.html" class="btn">Cadastrar</a>
+    </nav>
+  </header>
 
-<section class="card-grid">
-  <div class="card"><h3>🔥 Destaques do momento</h3><p>Veja os posts e perfis mais ativos da comunidade.</p></div>
-  <div class="card"><h3>⭐ Sistema de Pontos</h3><p>Interaja, ganhe pontos e promova seu perfil.</p></div>
-  <div class="card"><h3>🛡️ Segurança & Idade</h3><p>Regras claras para proteger todos os usuários.</p></div>
-  <div class="card"><h3>🎮 Área Gamer</h3><p>Jogos sociais em breve dentro da plataforma.</p></div>
-</section>
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Conectando pessoas de forma real</h1>
+    <p>
+      O ConecTexxto é uma nova rede social inspirada no melhor do Orkut,
+      chats clássicos e redes modernas — com foco em segurança, liberdade e recompensas.
+    </p>
 
-<footer>
-  © 2026 ConecTexxto · Projeto em desenvolvimento
-</footer>
+    <div class="actions">
+      <a href="cadastro/cadastro.html" class="btn">Criar conta</a>
+      <a href="login/login.html" class="btn outline">Entrar</a>
+    </div>
+  </section>
+
+  <!-- DESTAQUES -->
+  <section class="card-grid">
+
+    <div class="card">
+      <h3>🔥 Destaques do momento</h3>
+      <p>Veja os perfis, posts e assuntos mais comentados da rede.</p>
+    </div>
+
+    <div class="card">
+      <h3>⭐ Sistema de Pontos</h3>
+      <p>Ganhe pontos interagindo e use para promover seu perfil ou anúncios.</p>
+    </div>
+
+    <div class="card">
+      <h3>🛡️ Segurança & Idade</h3>
+      <p>Proteção para menores, verificação e regras claras para todos.</p>
+    </div>
+
+    <div class="card">
+      <h3>🎮 Área Gamer</h3>
+      <p>Jogos de navegador, projetos independentes e diversão integrada.</p>
+    </div>
+
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    © 2026 ConecTexxto · Projeto em desenvolvimento
+  </footer>
+
 </body>
 </html>
-
