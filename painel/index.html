@@ -1,4 +1,3 @@
-<!-- /painel/index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -15,15 +14,11 @@
     .welcome{background:#081426;border-radius:16px;padding:22px;box-shadow:0 10px 25px rgba(0,0,0,.35);}
     .welcome h1{font-size:28px;margin-bottom:8px;}
     .welcome p{opacity:.88;line-height:1.6;}
-    .pill{display:inline-flex;gap:8px;align-items:center;margin-top:12px;padding:8px 12px;border-radius:999px;background:rgba(30,144,255,.12);border:1px solid rgba(30,144,255,.25);font-size:13px;opacity:.95;}
     .grid{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}
     .mini{background:#081426;border-radius:16px;padding:18px;transition:.25s;box-shadow:0 10px 25px rgba(0,0,0,.25);}
     .mini:hover{transform:translateY(-4px);box-shadow:0 14px 28px rgba(0,0,0,.35);}
     .mini h3{margin-bottom:8px;}
     .mini p{opacity:.85;line-height:1.5;}
-    .btn2{display:inline-block;padding:10px 14px;border-radius:10px;font-weight:600;text-decoration:none;border:none;cursor:pointer;}
-    .btn-outline{background:transparent;border:2px solid #1E90FF;color:#1E90FF;}
-    .btn-outline:hover{background:#1E90FF;color:#fff;}
   </style>
 </head>
 
@@ -40,25 +35,21 @@
     <section class="panel">
       <div class="welcome">
         <h1 id="hello">Bem-vindo(a) 👋</h1>
-        <p id="desc">Carregando seus dados...</p>
-        <div class="pill" id="badge" style="display:none;"></div>
-        <div style="margin-top:14px;">
-          <a class="btn2 btn-outline" href="../">Voltar ao início</a>
-        </div>
+        <p id="desc">Carregando...</p>
       </div>
 
       <div class="grid">
         <div class="mini">
           <h3>🧑 Perfil</h3>
-          <p>Em breve: foto, bio, configurações e privacidade.</p>
+          <p>Em breve: editar perfil e foto.</p>
         </div>
         <div class="mini">
           <h3>⭐ Pontos</h3>
-          <p>Em breve: saldo, limites diários e antifraude.</p>
+          <p>Em breve: sistema de pontos e antifraude.</p>
         </div>
         <div class="mini">
           <h3>💬 Comunidade</h3>
-          <p>Em breve: feed, comentários e mural estilo clássico.</p>
+          <p>Em breve: feed, mural e comentários.</p>
         </div>
         <div class="mini">
           <h3>🎮 Área Gamer</h3>
@@ -70,36 +61,37 @@
 
   <footer>© 2026 ConecTexxto · Projeto em desenvolvimento</footer>
 
-  <script>
-    // Proteção do painel
-    if (!localStorage.getItem('usuarioLogado')) {
-      window.location.href = '../login/';
-    }
+  <script type="module">
+    import { supabase } from "../supabase.js";
 
-    const usuario = JSON.parse(localStorage.getItem('usuarioConecTexxto'));
+    const hello = document.getElementById("hello");
+    const desc = document.getElementById("desc");
 
-    const hello = document.getElementById('hello');
-    const desc = document.getElementById('desc');
-    const badge = document.getElementById('badge');
+    const { data: { session } } = await supabase.auth.getSession();
 
-    if (usuario) {
-      hello.textContent = `Bem-vindo(a), ${usuario.nome}! 👋`;
-
-      const idade = Number(usuario.idade);
-      const faixa = Number.isFinite(idade) ? (idade < 13 ? 'Menor (restrito)' : 'Membro') : 'Membro';
-      desc.textContent = `Você está logado no ConecTexxto. Sua faixa: ${faixa}.`;
-
-      badge.style.display = 'inline-flex';
-      badge.textContent = `Status: ${faixa}`;
+    if (!session) {
+      window.location.href = "../login/";
     } else {
-      desc.textContent = 'Dados do usuário não encontrados (cadastre novamente).';
+      const userId = session.user.id;
+
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("nome, idade")
+        .eq("id", userId)
+        .single();
+
+      if (error || !profile) {
+        desc.textContent = "Não foi possível carregar seu perfil agora.";
+      } else {
+        hello.textContent = `Bem-vindo(a), ${profile.nome}! 👋`;
+        desc.textContent = `Sua idade: ${profile.idade ?? "—"}.`;
+      }
     }
 
-    // Sair sem apagar a conta
-    document.getElementById('logout').addEventListener('click', (e) => {
+    document.getElementById("logout").addEventListener("click", async (e) => {
       e.preventDefault();
-      localStorage.removeItem('usuarioLogado');
-      window.location.href = '../login/';
+      await supabase.auth.signOut();
+      window.location.href = "../login/";
     });
   </script>
 </body>
