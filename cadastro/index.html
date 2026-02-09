@@ -3,70 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <title>Cadastro - ConecTexxto</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Fonte -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../auth.css">
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header>
-    <div class="logo">Conec<span>Texxto</span></div>
-    <nav>
-      <a href="../index.html">Início</a>
-      <a href="../login/" class="btn">Entrar</a>
-    </nav>
-  </header>
+<div class="auth-container">
+  <h1>Criar Conta</h1>
 
-  <!-- CADASTRO -->
-  <section class="hero">
-    <h1>Criar conta</h1>
-    <p>Cadastre-se para começar a se conectar com pessoas reais.</p>
+  <input type="text" id="nome" placeholder="Nome">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="senha" placeholder="Senha">
 
-    <form class="card" id="formCadastro" style="max-width:420px;margin:30px auto;">
-      <input type="text" id="nome" placeholder="Nome completo" required>
-      <br><br>
+  <button onclick="cadastrar()">Cadastrar</button>
 
-      <input type="email" id="email" placeholder="Email" required>
-      <br><br>
+  <p>Já tem conta?
+    <a href="../login/">Entrar</a>
+  </p>
+</div>
 
-      <input type="password" id="senha" placeholder="Senha" required>
-      <br><br>
+<script>
+function cadastrar() {
+  const nome = document.getElementById("nome").value;
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
 
-      <button type="submit" class="btn">Cadastrar</button>
-    </form>
-  </section>
+  if (!nome || !email || !senha) {
+    alert("Preencha todos os campos");
+    return;
+  }
 
-  <!-- FOOTER -->
-  <footer>
-    © 2026 ConecTexxto · Projeto em desenvolvimento
-  </footer>
+  const usuario = { nome, email, senha };
+  localStorage.setItem("usuarioConecTexxto", JSON.stringify(usuario));
 
-  <!-- SCRIPT -->
-  <script>
-    document.getElementById("formCadastro").addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const nome = document.getElementById("nome").value;
-      const email = document.getElementById("email").value;
-      const senha = document.getElementById("senha").value;
-
-      const usuario = {
-        nome: nome,
-        email: email,
-        senha: senha
-      };
-
-      localStorage.setItem("usuarioConecTexxto", JSON.stringify(usuario));
-
-      alert("Cadastro realizado com sucesso!");
-      window.location.href = "../login/";
-    });
-  </script>
+  alert("Conta criada com sucesso!");
+  window.location.href = "../login/";
+}
+</script>
 
 </body>
 </html>
