@@ -3,137 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <title>Login - ConecTexxto</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Fonte -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-
-    body {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #fff;
-    }
-
-    .login-box {
-      background: rgba(0,0,0,0.55);
-      padding: 40px;
-      border-radius: 14px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 0 40px rgba(0,0,0,0.6);
-      animation: fade 0.8s ease;
-    }
-
-    @keyframes fade {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .login-box h1 {
-      text-align: center;
-      margin-bottom: 10px;
-      font-size: 28px;
-    }
-
-    .login-box p {
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 14px;
-      opacity: 0.8;
-    }
-
-    .login-box input {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 15px;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-      font-size: 15px;
-    }
-
-    .login-box button {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #00c6ff, #0072ff);
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .login-box button:hover {
-      opacity: 0.85;
-    }
-
-    .links {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 14px;
-    }
-
-    .links a {
-      color: #00c6ff;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .links a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../auth.css">
 </head>
 <body>
 
-  <div class="login-box">
-    <h1>ConecTexxto</h1>
-    <p>Entre na sua conta</p>
+<div class="auth-container">
+  <h1>Entrar</h1>
 
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="senha" placeholder="Senha" required>
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="senha" placeholder="Senha">
 
-    <button onclick="fazerLogin()">Entrar</button>
+  <button onclick="login()">Entrar</button>
 
-    <div class="links">
-      Não tem conta?
-      <a href="../cadastro/">Criar agora</a>
-    </div>
-  </div>
+  <p>Não tem conta?
+    <a href="../cadastro/">Cadastrar</a>
+  </p>
+</div>
 
-  <script>
-    function fazerLogin() {
-      const email = document.getElementById("email").value;
-      const senha = document.getElementById("senha").value;
+<script>
+function login() {
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
 
-      const usuario = JSON.parse(localStorage.getItem("usuarioConecTexxto"));
+  const usuario = JSON.parse(localStorage.getItem("usuarioConecTexxto"));
 
-      if (!usuario) {
-        alert("Nenhum usuário cadastrado.");
-        return;
-      }
+  if (!usuario) {
+    alert("Nenhuma conta cadastrada!");
+    return;
+  }
 
-      if (email === usuario.email && senha === usuario.senha) {
-        alert("Login realizado com sucesso!");
-        window.location.href = "../painel/";
-      } else {
-        alert("Email ou senha inválidos.");
-      }
-    }
-  </script>
+  if (email === usuario.email && senha === usuario.senha) {
+    localStorage.setItem("usuarioLogado", "true");
+    window.location.href = "../painel/";
+  } else {
+    alert("Email ou senha incorretos");
+  }
+}
+</script>
 
 </body>
 </html>
