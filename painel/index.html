@@ -3,77 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <title>Painel - ConecTexxto</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Fonte -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="../styles.css">
+  <script>
+    if (!localStorage.getItem("usuarioLogado")) {
+      window.location.href = "../login/";
+    }
+  </script>
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header>
-    <div class="logo">Conec<span>Texxto</span></div>
-    <nav>
-      <a href="#" id="logout" class="btn outline">Sair</a>
-    </nav>
-  </header>
+<h1>Bem-vindo ao ConecTexxto</h1>
 
-  <!-- PAINEL -->
-  <section class="hero">
-    <h1>Bem-vindo(a) 👋</h1>
-    <p id="usuarioNome"></p>
-  </section>
+<button onclick="sair()">Sair</button>
 
-  <!-- CARDS -->
-  <section class="card-grid">
-
-    <div class="card">
-      <h3>🧑 Perfil</h3>
-      <p>Edite seus dados, foto e informações pessoais.</p>
-    </div>
-
-    <div class="card">
-      <h3>⭐ Pontos</h3>
-      <p>Acompanhe seu saldo e conquistas.</p>
-    </div>
-
-    <div class="card">
-      <h3>💬 Comunidade</h3>
-      <p>Interaja com pessoas e participe de tópicos.</p>
-    </div>
-
-    <div class="card">
-      <h3>🎮 Área Gamer</h3>
-      <p>Jogos e experiências sociais em breve.</p>
-    </div>
-
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-    © 2026 ConecTexxto · Painel do Usuário
-  </footer>
-
-  <!-- SCRIPT -->
-  <script>
-    const usuario = JSON.parse(localStorage.getItem("usuarioConecTexxto"));
-
-    if (!usuario) {
-      alert("Você precisa estar logado.");
-      window.location.href = "../login/";
-    } else {
-      document.getElementById("usuarioNome").innerText =
-        "Olá, " + usuario.nome + "! Você está logado no ConecTexxto.";
-    }
-
-    document.getElementById("logout").addEventListener("click", () => {
-      localStorage.removeItem("usuarioConecTexxto");
-      window.location.href = "../index.html";
-    });
-  </script>
+<script>
+function sair() {
+  localStorage.removeItem("usuarioLogado");
+  window.location.href = "../login/";
+}
+</script>
 
 </body>
 </html>
