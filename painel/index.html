@@ -12,16 +12,39 @@
     .wrap{min-height:calc(100vh - 70px - 64px);padding:28px 20px 60px;}
     .panel{max-width:900px;margin:0 auto;}
     .box{background:#081426;border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 10px 25px rgba(0,0,0,.35);}
+
     .welcome h1{font-size:26px;margin-bottom:6px;}
     .welcome p{opacity:.88;line-height:1.6;}
+
     textarea{width:100%;min-height:90px;border-radius:12px;padding:12px;border:1px solid rgba(30,144,255,.35);background:#050B18;color:#F5F7FA;outline:none;resize:none;}
     textarea:focus{border-color:#1E90FF;box-shadow:0 0 0 3px rgba(30,144,255,.15);}
+
     .btn2{margin-top:10px;padding:10px 16px;border-radius:10px;border:none;background:#1E90FF;color:#fff;font-weight:600;cursor:pointer;}
     .btn2:hover{filter:brightness(.95);}
-    .post h4{margin-bottom:6px;}
-    .post small{opacity:.6;}
-    .err{border:1px solid rgba(255,80,80,.35);background:rgba(255,80,80,.08);}
-    .ok{border:1px solid rgba(0,200,120,.35);background:rgba(0,200,120,.06);}
+
+    .toast{margin-top:12px;padding:12px;border-radius:12px;background:rgba(255,255,255,.06);display:none;}
+    .toast.ok{border:1px solid rgba(0,200,120,.35);}
+    .toast.err{border:1px solid rgba(255,80,80,.35);}
+
+    /* Post layout */
+    .post{padding:18px;}
+    .post-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;}
+    .avatar{
+      width:44px;height:44px;border-radius:12px;flex:0 0 auto;
+      background:#050B18;border:1px solid rgba(30,144,255,.25);
+      overflow:hidden;display:flex;align-items:center;justify-content:center;
+    }
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+    .avatar span{font-size:12px;opacity:.7;}
+
+    .meta{display:flex;flex-direction:column;gap:2px;min-width:0;}
+    .name-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px;}
+    .user{opacity:.75;font-weight:600;}
+    .time{opacity:.6;font-size:12px;margin-top:2px;}
+
+    .content{line-height:1.6;white-space:pre-wrap;word-break:break-word;}
+    .divider{height:1px;background:rgba(255,255,255,.06);margin-top:14px;}
   </style>
 </head>
 
@@ -30,8 +53,8 @@
     <div class="logo">Conec<span>Texxto</span></div>
     <nav>
       <a href="../">Início</a>
-      <a href="#" id="logout" class="btn">Sair</a>
       <a href="../perfil/" class="btn">Perfil</a>
+      <a href="#" id="logout" class="btn">Sair</a>
     </nav>
   </header>
 
@@ -49,11 +72,11 @@
         <h3>💬 Criar postagem</h3>
         <textarea id="content" placeholder="O que você está pensando?"></textarea>
         <button class="btn2" id="postBtn">Publicar</button>
-        <p id="postMsg" style="margin-top:10px;opacity:.85;"></p>
+        <div id="postMsg" class="toast"></div>
       </div>
 
       <!-- FEED -->
-      <div id="feedMsg" class="box" style="display:none;"></div>
+      <div id="feedMsg" class="box toast" style="display:none;"></div>
       <div id="feed"></div>
 
     </section>
@@ -69,36 +92,44 @@
 
     const feed = document.getElementById("feed");
     const feedMsg = document.getElementById("feedMsg");
+
     const postBtn = document.getElementById("postBtn");
     const contentInput = document.getElementById("content");
     const postMsg = document.getElementById("postMsg");
 
-    function showBox(el, type, text){
-      el.style.display = "block";
-      el.className = "box " + (type || "");
+    function show(el, type, text){
+      el.className = "toast " + (type || "");
       el.textContent = text;
+      el.style.display = "block";
     }
 
-    // Proteção: só entra logado
+    // sessão
     const { data: sessionData } = await supabase.auth.getSession();
     const session = sessionData?.session;
     if (!session) window.location.href = "../login/";
-
     const user = session.user;
+    const userId = user.id;
 
-    // Logout
+    // logout
     document.getElementById("logout").onclick = async (e) => {
       e.preventDefault();
       await supabase.auth.signOut();
       window.location.href = "../login/";
     };
 
-    // Carregar perfil
+    // pega URL pública do avatar (se existir)
+    function getAvatarUrl(uid){
+      const { data } = supabase.storage.from("avatars").getPublicUrl(`${uid}.png`);
+      // cache-buster para atualizar quando trocar foto
+      return data?.publicUrl ? `${data.publicUrl}?t=${Date.now()}` : "";
+    }
+
+    // carregar perfil
     async function loadProfile(){
       const { data: profile, error } = await supabase
         .from("profiles")
-        .select("nome, idade")
-        .eq("id", user.id)
+        .select("nome, idade, username")
+        .eq("id", userId)
         .single();
 
       if (error || !profile){
@@ -107,68 +138,82 @@
         return;
       }
 
+      const u = profile.username ? `@${profile.username}` : "";
       hello.textContent = `Bem-vindo(a), ${profile.nome}! 👋`;
-      desc.textContent = `Sua idade: ${profile.idade ?? "—"}.`;
+      desc.textContent = `Sua idade: ${profile.idade ?? "—"}. ${u ? "Seu usuário: " + u : ""}`;
     }
 
-    // Criar post
+    // publicar post
     postBtn.onclick = async () => {
+      postMsg.style.display = "none";
       const content = contentInput.value.trim();
-      if (!content) {
-        postMsg.textContent = "Digite algo antes de publicar.";
-        return;
-      }
+      if (!content) return show(postMsg, "err", "Digite algo antes de publicar.");
 
-      postMsg.textContent = "Publicando...";
+      show(postMsg, "", "Publicando...");
 
       const { error } = await supabase.from("posts").insert({
-        user_id: user.id,
+        user_id: userId,
         content
       });
 
-      if (error){
-        postMsg.textContent = "Erro ao publicar: " + error.message;
-        return;
-      }
+      if (error) return show(postMsg, "err", "Erro: " + error.message);
 
-      postMsg.textContent = "Publicado ✅";
+      show(postMsg, "ok", "Publicado ✅");
       contentInput.value = "";
       await loadFeed();
     };
 
-    // Carregar feed (com join certo)
+    // feed
     async function loadFeed(){
       feed.innerHTML = "";
       feedMsg.style.display = "none";
 
       const { data, error } = await supabase
         .from("posts")
-        .select("id, content, created_at, profiles(nome)")
+        .select("id, content, created_at, user_id, profiles(nome, username)")
         .order("created_at", { ascending: false });
 
       if (error){
-        showBox(feedMsg, "err", "Erro ao carregar feed: " + error.message);
+        feedMsg.style.display = "block";
+        feedMsg.textContent = "Erro ao carregar feed: " + error.message;
         return;
       }
 
       if (!data || data.length === 0){
-        showBox(feedMsg, "ok", "Ainda não há postagens. Seja o primeiro a postar 😊");
+        feedMsg.style.display = "block";
+        feedMsg.textContent = "Ainda não há postagens. Seja o primeiro a postar 😊";
         return;
       }
 
       for (const post of data){
+        const nome = post.profiles?.nome || "Usuário";
+        const username = post.profiles?.username ? `@${post.profiles.username}` : "@usuario";
+        const avatarUrl = getAvatarUrl(post.user_id);
+
         const div = document.createElement("div");
         div.className = "box post";
+
         div.innerHTML = `
-          <h4>${post.profiles?.nome || "Usuário"}</h4>
-          <p>${escapeHtml(post.content)}</p>
-          <small>${new Date(post.created_at).toLocaleString()}</small>
+          <div class="post-head">
+            <div class="avatar">
+              ${avatarUrl ? `<img src="${avatarUrl}" alt="avatar">` : `<span>sem</span>`}
+            </div>
+            <div class="meta">
+              <div class="name-row">
+                <div class="name">${escapeHtml(nome)}</div>
+                <div class="user">${escapeHtml(username)}</div>
+              </div>
+              <div class="time">${new Date(post.created_at).toLocaleString()}</div>
+            </div>
+          </div>
+
+          <div class="content">${escapeHtml(post.content)}</div>
         `;
+
         feed.appendChild(div);
       }
     }
 
-    // Segurança básica contra HTML em post
     function escapeHtml(str){
       return String(str)
         .replaceAll("&","&amp;")
