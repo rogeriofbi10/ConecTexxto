@@ -1,4 +1,3 @@
-<!-- /login/index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -10,14 +9,13 @@
   <link rel="stylesheet" href="../styles.css">
 
   <style>
-    /* Mesmo visual do site + formulário bonito */
     .page-wrap{min-height:calc(100vh - 70px - 64px);display:flex;align-items:center;justify-content:center;padding:40px 20px;}
     .auth-card{width:100%;max-width:460px;background:#081426;border-radius:16px;padding:26px;box-shadow:0 10px 25px rgba(0,0,0,.35);}
     .auth-title{font-size:26px;margin-bottom:6px;}
     .auth-sub{opacity:.85;margin-bottom:18px;line-height:1.5;}
     .field{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
     .field label{font-size:14px;opacity:.9;}
-    .field input{width:100%;padding:12px 12px;border-radius:10px;border:1px solid rgba(30,144,255,.35);background:#050B18;color:#F5F7FA;outline:none;}
+    .field input{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(30,144,255,.35);background:#050B18;color:#F5F7FA;outline:none;}
     .field input:focus{border-color:#1E90FF;box-shadow:0 0 0 3px rgba(30,144,255,.15);}
     .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;}
     .btn2{display:inline-block;padding:12px 16px;border-radius:10px;font-weight:600;text-decoration:none;border:none;cursor:pointer;}
@@ -25,12 +23,12 @@
     .btn-outline{background:transparent;border:2px solid #1E90FF;color:#1E90FF;}
     .btn-primary:hover{filter:brightness(.95);}
     .btn-outline:hover{background:#1E90FF;color:#fff;}
-    .helper{margin-top:14px;opacity:.9;font-size:14px;}
-    .helper a{color:#1E90FF;text-decoration:none;font-weight:600;}
-    .helper a:hover{text-decoration:underline;}
     .toast{margin-top:14px;padding:12px;border-radius:12px;background:rgba(255,255,255,.06);display:none;}
     .toast.ok{border:1px solid rgba(0,200,120,.35);}
     .toast.err{border:1px solid rgba(255,80,80,.35);}
+    .helper{margin-top:14px;opacity:.9;font-size:14px;}
+    .helper a{color:#1E90FF;text-decoration:none;font-weight:600;}
+    .helper a:hover{text-decoration:underline;}
   </style>
 </head>
 
@@ -46,17 +44,16 @@
   <main class="page-wrap">
     <section class="auth-card">
       <h1 class="auth-title">Entrar</h1>
-      <p class="auth-sub">Acesse sua conta para continuar no ConecTexxto.</p>
+      <p class="auth-sub">Login real com Supabase.</p>
 
       <form id="formLogin">
         <div class="field">
-          <label for="email">E-mail</label>
-          <input id="email" type="email" placeholder="seuemail@exemplo.com" required>
+          <label>E-mail</label>
+          <input id="email" type="email" required>
         </div>
-
         <div class="field">
-          <label for="senha">Senha</label>
-          <input id="senha" type="password" placeholder="Sua senha" required>
+          <label>Senha</label>
+          <input id="senha" type="password" required>
         </div>
 
         <div class="row">
@@ -75,37 +72,35 @@
 
   <footer>© 2026 ConecTexxto · Projeto em desenvolvimento</footer>
 
-  <script>
-    // Login usando usuário salvo no cadastro + sessão separada (não apaga conta ao sair)
-    const form = document.getElementById('formLogin');
-    const msg = document.getElementById('msg');
+  <script type="module">
+    import { supabase } from "../supabase.js";
+
+    const form = document.getElementById("formLogin");
+    const msg = document.getElementById("msg");
 
     function show(type, text){
-      msg.className = 'toast ' + (type || '');
+      msg.className = "toast " + (type || "");
       msg.textContent = text;
-      msg.style.display = 'block';
+      msg.style.display = "block";
     }
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const email = document.getElementById('email').value.trim();
-      const senha = document.getElementById('senha').value;
+      const email = document.getElementById("email").value.trim();
+      const senha = document.getElementById("senha").value;
 
-      const usuario = JSON.parse(localStorage.getItem('usuarioConecTexxto'));
+      show("", "Entrando...");
 
-      if(!usuario){
-        show('err', 'Nenhuma conta encontrada. Faça o cadastro primeiro.');
-        return;
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password: senha
+      });
 
-      if(email === usuario.email && senha === usuario.senha){
-        localStorage.setItem('usuarioLogado', 'true');
-        show('ok', 'Login realizado! Redirecionando...');
-        setTimeout(() => window.location.href = '../painel/', 650);
-      } else {
-        show('err', 'E-mail ou senha incorretos.');
-      }
+      if (error) return show("err", error.message);
+
+      show("ok", "Login feito! Indo para o painel...");
+      setTimeout(() => window.location.href = "../painel/", 650);
     });
   </script>
 </body>
