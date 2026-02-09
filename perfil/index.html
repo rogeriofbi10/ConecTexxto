@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil | ConecTexxto</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+
+  <style>
+    .wrap{min-height:calc(100vh - 70px - 64px);padding:28px 20px 60px;}
+    .panel{max-width:900px;margin:0 auto;}
+    .box{background:#081426;border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 10px 25px rgba(0,0,0,.35);}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px;}
+    @media(min-width:900px){.grid{grid-template-columns:320px 1fr;}}
+    .avatar{
+      width:140px;height:140px;border-radius:18px;
+      background:#050B18;border:1px solid rgba(30,144,255,.35);
+      overflow:hidden;display:flex;align-items:center;justify-content:center;
+    }
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+    .field{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+    .field label{font-size:14px;opacity:.9;}
+    .field input{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(30,144,255,.35);background:#050B18;color:#F5F7FA;outline:none;}
+    .field input:focus{border-color:#1E90FF;box-shadow:0 0 0 3px rgba(30,144,255,.15);}
+    .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;}
+    .btn2{padding:10px 16px;border-radius:10px;border:none;background:#1E90FF;color:#fff;font-weight:600;cursor:pointer;}
+    .btn2:hover{filter:brightness(.95);}
+    .muted{opacity:.75;font-size:13px;line-height:1.5;}
+    .toast{margin-top:12px;padding:12px;border-radius:12px;background:rgba(255,255,255,.06);display:none;}
+    .toast.ok{border:1px solid rgba(0,200,120,.35);}
+    .toast.err{border:1px solid rgba(255,80,80,.35);}
+    .hint{font-size:13px;opacity:.8;margin-top:6px;}
+    .navmini{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;}
+    .navmini a{color:#F5F7FA;text-decoration:none;opacity:.9}
+    .navmini a:hover{opacity:1;text-decoration:underline}
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">Conec<span>Texxto</span></div>
+    <nav>
+      <a href="../">Início</a>
+      <a href="../painel/" class="btn">Painel</a>
+      <a href="#" id="logout" class="btn">Sair</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="panel">
+
+      <div class="box">
+        <h2>Seu perfil</h2>
+        <div class="navmini">
+          <a href="../painel/">← Voltar</a>
+        </div>
+        <p class="muted">Aqui você define seu <b>@username</b> e sua foto. Isso prepara tudo pro feed mostrar perfil completo.</p>
+      </div>
+
+      <div class="grid">
+        <div class="box">
+          <div class="avatar" id="avatarBox">
+            <span class="muted">Sem foto</span>
+          </div>
+
+          <div style="margin-top:14px;">
+            <div class="field">
+              <label>Foto de perfil (JPG/PNG)</label>
+              <input id="avatarFile" type="file" accept="image/*">
+              <div class="hint">Dica: depois de enviar, recarregue a página se necessário.</div>
+            </div>
+            <button class="btn2" id="btnUpload">Enviar foto</button>
+          </div>
+
+          <div id="upMsg" class="toast"></div>
+        </div>
+
+        <div class="box">
+          <form id="form">
+            <div class="field">
+              <label>Nome</label>
+              <input id="nome" type="text" required>
+            </div>
+
+            <div class="field">
+              <label>@username (único)</label>
+              <input id="username" type="text" placeholder="ex: rogeriofelipe" required>
+              <div class="hint">Sem espaço. Pode usar letras, números, ponto e underline.</div>
+            </div>
+
+            <div class="field">
+              <label>Idade</label>
+              <input id="idade" type="number" min="0" max="120">
+            </div>
+
+            <div class="field">
+              <label>Telefone</label>
+              <input id="telefone" type="tel">
+            </div>
+
+            <div class="row">
+              <button class="btn2" type="submit">Salvar</button>
+              <a class="btn2" href="../painel/" style="text-decoration:none;display:inline-flex;align-items:center;">Voltar</a>
+            </div>
+
+            <div id="msg" class="toast"></div>
+          </form>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <footer>© 2026 ConecTexxto · Projeto em desenvolvimento</footer>
+
+  <script type="module">
+    import { supabase } from "../supabase.js";
+
+    const msg = document.getElementById("msg");
+    const upMsg = document.getElementById("upMsg");
+    const avatarBox = document.getElementById("avatarBox");
+
+    function show(el, type, text){
+      el.className = "toast " + (type || "");
+      el.textContent = text;
+      el.style.display = "block";
+    }
+
+    function cleanUsername(raw){
+      return raw
+        .trim()
+        .toLowerCase()
+        .replace(/^@+/, "")
+        .replace(/\s+/g, "")
+        .replace(/[^a-z0-9._]/g, "");
+    }
+
+    // sessão
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) window.location.href = "../login/";
+    const userId = session.user.id;
+
+    // logout
+    document.getElementById("logout").onclick = async (e) => {
+      e.preventDefault();
+      await supabase.auth.signOut();
+      window.location.href = "../login/";
+    };
+
+    // carregar perfil
+    async function load(){
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("nome, idade, telefone, username")
+        .eq("id", userId)
+        .single();
+
+      if (profile){
+        document.getElementById("nome").value = profile.nome ?? "";
+        document.getElementById("idade").value = profile.idade ?? "";
+        document.getElementById("telefone").value = profile.telefone ?? "";
+        document.getElementById("username").value = profile.username ?? "";
+      }
+
+      // carrega avatar se existir
+      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(`${userId}.png`);
+      if (pub?.publicUrl){
+        avatarBox.innerHTML = `<img src="${pub.publicUrl}?t=${Date.now()}" alt="avatar">`;
+      }
+    }
+
+    await load();
+
+    // salvar perfil
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msg.style.display = "none";
+
+      const nome = document.getElementById("nome").value.trim();
+      const idade = Number(document.getElementById("idade").value || 0);
+      const telefone = document.getElementById("telefone").value.trim();
+      const username = cleanUsername(document.getElementById("username").value);
+
+      if (!nome) return show(msg, "err", "Nome é obrigatório.");
+      if (!username) return show(msg, "err", "Username é obrigatório.");
+
+      // valida formato
+      if (!/^[a-z0-9._]{3,20}$/.test(username)){
+        return show(msg, "err", "Username inválido (3 a 20, letras/números/ponto/underline).");
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({ nome, idade: idade || null, telefone, username })
+        .eq("id", userId);
+
+      if (error){
+        // conflito de username (unique)
+        if (String(error.message).toLowerCase().includes("duplicate")){
+          return show(msg, "err", "Esse @username já existe. Tente outro.");
+        }
+        return show(msg, "err", error.message);
+      }
+
+      show(msg, "ok", "Perfil salvo ✅");
+    });
+
+    // upload avatar
+    document.getElementById("btnUpload").addEventListener("click", async () => {
+      upMsg.style.display = "none";
+      const file = document.getElementById("avatarFile").files?.[0];
+      if (!file) return show(upMsg, "err", "Escolha uma imagem primeiro.");
+
+      // sempre salva como png (simples). Se preferir manter original, eu ajusto depois.
+      const filePath = `${userId}.png`;
+
+      const { error } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, file, { upsert: true, contentType: file.type });
+
+      if (error) return show(upMsg, "err", error.message);
+
+      show(upMsg, "ok", "Foto enviada ✅");
+      await load();
+    });
+  </script>
+</body>
+</html>
