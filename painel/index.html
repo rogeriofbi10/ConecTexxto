@@ -10,15 +10,14 @@
 
   <style>
     .wrap{min-height:calc(100vh - 70px - 64px);padding:28px 20px 60px;}
-    .panel{max-width:980px;margin:0 auto;}
-    .welcome{background:#081426;border-radius:16px;padding:22px;box-shadow:0 10px 25px rgba(0,0,0,.35);}
-    .welcome h1{font-size:28px;margin-bottom:8px;}
-    .welcome p{opacity:.88;line-height:1.6;}
-    .grid{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}
-    .mini{background:#081426;border-radius:16px;padding:18px;transition:.25s;box-shadow:0 10px 25px rgba(0,0,0,.25);}
-    .mini:hover{transform:translateY(-4px);box-shadow:0 14px 28px rgba(0,0,0,.35);}
-    .mini h3{margin-bottom:8px;}
-    .mini p{opacity:.85;line-height:1.5;}
+    .panel{max-width:760px;margin:0 auto;}
+    .box{background:#081426;border-radius:16px;padding:20px;margin-bottom:20px;box-shadow:0 10px 25px rgba(0,0,0,.35);}
+    textarea{width:100%;min-height:90px;border-radius:12px;padding:12px;border:1px solid rgba(30,144,255,.35);background:#050B18;color:#F5F7FA;outline:none;resize:none;}
+    textarea:focus{border-color:#1E90FF;}
+    .btn2{margin-top:10px;padding:10px 16px;border-radius:10px;border:none;background:#1E90FF;color:#fff;font-weight:600;cursor:pointer;}
+    .post{margin-bottom:16px;}
+    .post h4{margin-bottom:6px;}
+    .post small{opacity:.6;}
   </style>
 </head>
 
@@ -33,29 +32,17 @@
 
   <main class="wrap">
     <section class="panel">
-      <div class="welcome">
-        <h1 id="hello">Bem-vindo(a) 👋</h1>
-        <p id="desc">Carregando...</p>
+
+      <!-- NOVA POSTAGEM -->
+      <div class="box">
+        <h3>💬 Criar postagem</h3>
+        <textarea id="content" placeholder="O que você está pensando?"></textarea>
+        <button class="btn2" id="postBtn">Publicar</button>
       </div>
 
-      <div class="grid">
-        <div class="mini">
-          <h3>🧑 Perfil</h3>
-          <p>Em breve: editar perfil e foto.</p>
-        </div>
-        <div class="mini">
-          <h3>⭐ Pontos</h3>
-          <p>Em breve: sistema de pontos e antifraude.</p>
-        </div>
-        <div class="mini">
-          <h3>💬 Comunidade</h3>
-          <p>Em breve: feed, mural e comentários.</p>
-        </div>
-        <div class="mini">
-          <h3>🎮 Área Gamer</h3>
-          <p>Em breve: jogos de navegador e devs publicando jogos.</p>
-        </div>
-      </div>
+      <!-- FEED -->
+      <div id="feed"></div>
+
     </section>
   </main>
 
@@ -64,35 +51,65 @@
   <script type="module">
     import { supabase } from "../supabase.js";
 
-    const hello = document.getElementById("hello");
-    const desc = document.getElementById("desc");
+    const feed = document.getElementById("feed");
+    const postBtn = document.getElementById("postBtn");
+    const contentInput = document.getElementById("content");
 
+    // Proteção
     const { data: { session } } = await supabase.auth.getSession();
+    if (!session) window.location.href = "../login/";
 
-    if (!session) {
-      window.location.href = "../login/";
-    } else {
-      const userId = session.user.id;
+    const user = session.user;
 
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("nome, idade")
-        .eq("id", userId)
-        .single();
-
-      if (error || !profile) {
-        desc.textContent = "Não foi possível carregar seu perfil agora.";
-      } else {
-        hello.textContent = `Bem-vindo(a), ${profile.nome}! 👋`;
-        desc.textContent = `Sua idade: ${profile.idade ?? "—"}.`;
-      }
-    }
-
-    document.getElementById("logout").addEventListener("click", async (e) => {
-      e.preventDefault();
+    // LOGOUT
+    document.getElementById("logout").onclick = async () => {
       await supabase.auth.signOut();
       window.location.href = "../login/";
-    });
+    };
+
+    // CRIAR POST
+    postBtn.onclick = async () => {
+      const content = contentInput.value.trim();
+      if (!content) return alert("Digite algo");
+
+      const { error } = await supabase.from("posts").insert({
+        user_id: user.id,
+        content
+      });
+
+      if (error) return alert(error.message);
+
+      contentInput.value = "";
+      loadFeed();
+    };
+
+    // CARREGAR FEED
+    async function loadFeed() {
+      feed.innerHTML = "";
+
+      const { data, error } = await supabase
+        .from("posts")
+        .select("content, created_at, profiles(nome)")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        feed.innerHTML = "<p>Erro ao carregar feed</p>";
+        return;
+      }
+
+      data.forEach(post => {
+        const div = document.createElement("div");
+        div.className = "box post";
+        div.innerHTML = `
+          <h4>${post.profiles?.nome || "Usuário"}</h4>
+          <p>${post.content}</p>
+          <small>${new Date(post.created_at).toLocaleString()}</small>
+        `;
+        feed.appendChild(div);
+      });
+    }
+
+    loadFeed();
   </script>
 </body>
 </html>
