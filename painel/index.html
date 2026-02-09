@@ -1,27 +1,106 @@
+<!-- /painel/index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Painel - ConecTexxto</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel | ConecTexxto</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+
+  <style>
+    .wrap{min-height:calc(100vh - 70px - 64px);padding:28px 20px 60px;}
+    .panel{max-width:980px;margin:0 auto;}
+    .welcome{background:#081426;border-radius:16px;padding:22px;box-shadow:0 10px 25px rgba(0,0,0,.35);}
+    .welcome h1{font-size:28px;margin-bottom:8px;}
+    .welcome p{opacity:.88;line-height:1.6;}
+    .pill{display:inline-flex;gap:8px;align-items:center;margin-top:12px;padding:8px 12px;border-radius:999px;background:rgba(30,144,255,.12);border:1px solid rgba(30,144,255,.25);font-size:13px;opacity:.95;}
+    .grid{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}
+    .mini{background:#081426;border-radius:16px;padding:18px;transition:.25s;box-shadow:0 10px 25px rgba(0,0,0,.25);}
+    .mini:hover{transform:translateY(-4px);box-shadow:0 14px 28px rgba(0,0,0,.35);}
+    .mini h3{margin-bottom:8px;}
+    .mini p{opacity:.85;line-height:1.5;}
+    .btn2{display:inline-block;padding:10px 14px;border-radius:10px;font-weight:600;text-decoration:none;border:none;cursor:pointer;}
+    .btn-outline{background:transparent;border:2px solid #1E90FF;color:#1E90FF;}
+    .btn-outline:hover{background:#1E90FF;color:#fff;}
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">Conec<span>Texxto</span></div>
+    <nav>
+      <a href="../">Início</a>
+      <a href="#" id="logout" class="btn">Sair</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="panel">
+      <div class="welcome">
+        <h1 id="hello">Bem-vindo(a) 👋</h1>
+        <p id="desc">Carregando seus dados...</p>
+        <div class="pill" id="badge" style="display:none;"></div>
+        <div style="margin-top:14px;">
+          <a class="btn2 btn-outline" href="../">Voltar ao início</a>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="mini">
+          <h3>🧑 Perfil</h3>
+          <p>Em breve: foto, bio, configurações e privacidade.</p>
+        </div>
+        <div class="mini">
+          <h3>⭐ Pontos</h3>
+          <p>Em breve: saldo, limites diários e antifraude.</p>
+        </div>
+        <div class="mini">
+          <h3>💬 Comunidade</h3>
+          <p>Em breve: feed, comentários e mural estilo clássico.</p>
+        </div>
+        <div class="mini">
+          <h3>🎮 Área Gamer</h3>
+          <p>Em breve: jogos de navegador e devs publicando jogos.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 ConecTexxto · Projeto em desenvolvimento</footer>
 
   <script>
-    if (!localStorage.getItem("usuarioLogado")) {
-      window.location.href = "../login/";
+    // Proteção do painel
+    if (!localStorage.getItem('usuarioLogado')) {
+      window.location.href = '../login/';
     }
+
+    const usuario = JSON.parse(localStorage.getItem('usuarioConecTexxto'));
+
+    const hello = document.getElementById('hello');
+    const desc = document.getElementById('desc');
+    const badge = document.getElementById('badge');
+
+    if (usuario) {
+      hello.textContent = `Bem-vindo(a), ${usuario.nome}! 👋`;
+
+      const idade = Number(usuario.idade);
+      const faixa = Number.isFinite(idade) ? (idade < 13 ? 'Menor (restrito)' : 'Membro') : 'Membro';
+      desc.textContent = `Você está logado no ConecTexxto. Sua faixa: ${faixa}.`;
+
+      badge.style.display = 'inline-flex';
+      badge.textContent = `Status: ${faixa}`;
+    } else {
+      desc.textContent = 'Dados do usuário não encontrados (cadastre novamente).';
+    }
+
+    // Sair sem apagar a conta
+    document.getElementById('logout').addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.removeItem('usuarioLogado');
+      window.location.href = '../login/';
+    });
   </script>
-</head>
-<body>
-
-<h1>Bem-vindo ao ConecTexxto</h1>
-
-<button onclick="sair()">Sair</button>
-
-<script>
-function sair() {
-  localStorage.removeItem("usuarioLogado");
-  window.location.href = "../login/";
-}
-</script>
-
 </body>
 </html>
