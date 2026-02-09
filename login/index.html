@@ -1,46 +1,112 @@
+<!-- /login/index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Login - ConecTexxto</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../auth.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrar | ConecTexxto</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+
+  <style>
+    /* Mesmo visual do site + formulário bonito */
+    .page-wrap{min-height:calc(100vh - 70px - 64px);display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+    .auth-card{width:100%;max-width:460px;background:#081426;border-radius:16px;padding:26px;box-shadow:0 10px 25px rgba(0,0,0,.35);}
+    .auth-title{font-size:26px;margin-bottom:6px;}
+    .auth-sub{opacity:.85;margin-bottom:18px;line-height:1.5;}
+    .field{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+    .field label{font-size:14px;opacity:.9;}
+    .field input{width:100%;padding:12px 12px;border-radius:10px;border:1px solid rgba(30,144,255,.35);background:#050B18;color:#F5F7FA;outline:none;}
+    .field input:focus{border-color:#1E90FF;box-shadow:0 0 0 3px rgba(30,144,255,.15);}
+    .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;}
+    .btn2{display:inline-block;padding:12px 16px;border-radius:10px;font-weight:600;text-decoration:none;border:none;cursor:pointer;}
+    .btn-primary{background:#1E90FF;color:#fff;}
+    .btn-outline{background:transparent;border:2px solid #1E90FF;color:#1E90FF;}
+    .btn-primary:hover{filter:brightness(.95);}
+    .btn-outline:hover{background:#1E90FF;color:#fff;}
+    .helper{margin-top:14px;opacity:.9;font-size:14px;}
+    .helper a{color:#1E90FF;text-decoration:none;font-weight:600;}
+    .helper a:hover{text-decoration:underline;}
+    .toast{margin-top:14px;padding:12px;border-radius:12px;background:rgba(255,255,255,.06);display:none;}
+    .toast.ok{border:1px solid rgba(0,200,120,.35);}
+    .toast.err{border:1px solid rgba(255,80,80,.35);}
+  </style>
 </head>
+
 <body>
+  <header>
+    <div class="logo">Conec<span>Texxto</span></div>
+    <nav>
+      <a href="../">Início</a>
+      <a href="../cadastro/" class="btn">Criar Conta</a>
+    </nav>
+  </header>
 
-<div class="auth-container">
-  <h1>Entrar</h1>
+  <main class="page-wrap">
+    <section class="auth-card">
+      <h1 class="auth-title">Entrar</h1>
+      <p class="auth-sub">Acesse sua conta para continuar no ConecTexxto.</p>
 
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="senha" placeholder="Senha">
+      <form id="formLogin">
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input id="email" type="email" placeholder="seuemail@exemplo.com" required>
+        </div>
 
-  <button onclick="login()">Entrar</button>
+        <div class="field">
+          <label for="senha">Senha</label>
+          <input id="senha" type="password" placeholder="Sua senha" required>
+        </div>
 
-  <p>Não tem conta?
-    <a href="../cadastro/">Cadastrar</a>
-  </p>
-</div>
+        <div class="row">
+          <button class="btn2 btn-primary" type="submit">Entrar</button>
+          <a class="btn2 btn-outline" href="../">Voltar ao início</a>
+        </div>
 
-<script>
-function login() {
-  const email = document.getElementById("email").value;
-  const senha = document.getElementById("senha").value;
+        <div class="helper">
+          Não tem conta? <a href="../cadastro/">Cadastrar agora</a>
+        </div>
 
-  const usuario = JSON.parse(localStorage.getItem("usuarioConecTexxto"));
+        <div id="msg" class="toast"></div>
+      </form>
+    </section>
+  </main>
 
-  if (!usuario) {
-    alert("Nenhuma conta cadastrada!");
-    return;
-  }
+  <footer>© 2026 ConecTexxto · Projeto em desenvolvimento</footer>
 
-  if (email === usuario.email && senha === usuario.senha) {
-    localStorage.setItem("usuarioLogado", "true");
-    window.location.href = "../painel/";
-  } else {
-    alert("Email ou senha incorretos");
-  }
-}
-</script>
+  <script>
+    // Login usando usuário salvo no cadastro + sessão separada (não apaga conta ao sair)
+    const form = document.getElementById('formLogin');
+    const msg = document.getElementById('msg');
 
+    function show(type, text){
+      msg.className = 'toast ' + (type || '');
+      msg.textContent = text;
+      msg.style.display = 'block';
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const senha = document.getElementById('senha').value;
+
+      const usuario = JSON.parse(localStorage.getItem('usuarioConecTexxto'));
+
+      if(!usuario){
+        show('err', 'Nenhuma conta encontrada. Faça o cadastro primeiro.');
+        return;
+      }
+
+      if(email === usuario.email && senha === usuario.senha){
+        localStorage.setItem('usuarioLogado', 'true');
+        show('ok', 'Login realizado! Redirecionando...');
+        setTimeout(() => window.location.href = '../painel/', 650);
+      } else {
+        show('err', 'E-mail ou senha incorretos.');
+      }
+    });
+  </script>
 </body>
 </html>
