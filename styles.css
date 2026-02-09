@@ -1,0 +1,41 @@
+body {
+  background: #0A1A2F;
+  color: #F5F7FA;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: #081426;
+  padding: 20px;
+  color: #F5F7FA;
+}
+
+.logo span {
+  color: #1E90FF;
+}
+
+nav a {
+  color: #F5F7FA;
+  text-decoration: none;
+  margin-left: 15px;
+}
+
+.card {
+  background: #081426;
+  padding: 20px;
+  border-radius: 14px;
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+  opacity: 0.7;
+}
