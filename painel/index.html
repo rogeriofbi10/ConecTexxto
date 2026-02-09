@@ -1,230 +1,62 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel | ConecTexxto</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../styles.css">
-
-  <style>
-    .wrap{min-height:calc(100vh - 70px - 64px);padding:28px 20px 60px;}
-    .panel{max-width:900px;margin:0 auto;}
-    .box{background:#081426;border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 10px 25px rgba(0,0,0,.35);}
-
-    .welcome h1{font-size:26px;margin-bottom:6px;}
-    .welcome p{opacity:.88;line-height:1.6;}
-
-    textarea{width:100%;min-height:90px;border-radius:12px;padding:12px;border:1px solid rgba(30,144,255,.35);background:#050B18;color:#F5F7FA;outline:none;resize:none;}
-    textarea:focus{border-color:#1E90FF;box-shadow:0 0 0 3px rgba(30,144,255,.15);}
-
-    .btn2{margin-top:10px;padding:10px 16px;border-radius:10px;border:none;background:#1E90FF;color:#fff;font-weight:600;cursor:pointer;}
-    .btn2:hover{filter:brightness(.95);}
-
-    .toast{margin-top:12px;padding:12px;border-radius:12px;background:rgba(255,255,255,.06);display:none;}
-    .toast.ok{border:1px solid rgba(0,200,120,.35);}
-    .toast.err{border:1px solid rgba(255,80,80,.35);}
-
-    /* Post layout */
-    .post{padding:18px;}
-    .post-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;}
-    .avatar{
-      width:44px;height:44px;border-radius:12px;flex:0 0 auto;
-      background:#050B18;border:1px solid rgba(30,144,255,.25);
-      overflow:hidden;display:flex;align-items:center;justify-content:center;
-    }
-    .avatar img{width:100%;height:100%;object-fit:cover;display:block;}
-    .avatar span{font-size:12px;opacity:.7;}
-
-    .meta{display:flex;flex-direction:column;gap:2px;min-width:0;}
-    .name-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-    .name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px;}
-    .user{opacity:.75;font-weight:600;}
-    .time{opacity:.6;font-size:12px;margin-top:2px;}
-
-    .content{line-height:1.6;white-space:pre-wrap;word-break:break-word;}
-    .divider{height:1px;background:rgba(255,255,255,.06);margin-top:14px;}
-  </style>
-</head>
-
-<body>
-  <header>
-    <div class="logo">Conec<span>Texxto</span></div>
-    <nav>
-      <a href="../">Início</a>
-      <a href="../perfil/" class="btn">Perfil</a>
-      <a href="#" id="logout" class="btn">Sair</a>
+<!-- Header fixo ou sticky -->
+<header class="bg-gray-950 border-b border-gray-800 sticky top-0 z-10">
+  <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-blue-400">ConecTexxto</h1>
+    <nav class="flex gap-6 text-gray-300">
+      <a href="/" class="hover:text-white transition">Início</a>
+      <a href="/perfil/" class="hover:text-white transition">Perfil</a>
+      <a href="#" onclick="logout()" class="hover:text-red-400 transition">Sair</a>
     </nav>
-  </header>
+  </div>
+</header>
 
-  <main class="wrap">
-    <section class="panel">
-
-      <!-- PERFIL / BOAS-VINDAS -->
-      <div class="box welcome">
-        <h1 id="hello">Bem-vindo(a) 👋</h1>
-        <p id="desc">Carregando seu perfil...</p>
+<!-- Conteúdo principal -->
+<main class="bg-gradient-to-b from-gray-950 to-gray-900 min-h-screen text-gray-100">
+  <div class="max-w-3xl mx-auto px-4 py-8">
+    <!-- Boas-vindas card -->
+    <div class="bg-gray-800/70 backdrop-blur-lg rounded-2xl shadow-2xl p-6 mb-8 border border-gray-700">
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-2xl font-bold">
+          RF <!-- ou <img src="sua-foto.jpg" class="rounded-full w-full h-full object-cover"> -->
+        </div>
+        <div>
+          <h2 class="text-2xl font-semibold">Bem-vindo(a), Rogério Felipe! 👋</h2>
+          <p class="text-gray-400">Idade: 34 | @rogerioreact</p>
+        </div>
       </div>
+    </div>
 
-      <!-- NOVA POSTAGEM -->
-      <div class="box">
-        <h3>💬 Criar postagem</h3>
-        <textarea id="content" placeholder="O que você está pensando?"></textarea>
-        <button class="btn2" id="postBtn">Publicar</button>
-        <div id="postMsg" class="toast"></div>
+    <!-- Criar postagem -->
+    <div class="bg-gray-800 rounded-2xl shadow-xl p-6 mb-10 border border-gray-700">
+      <h3 class="text-lg font-medium mb-4 flex items-center gap-2">
+        <span class="text-blue-400">✍️</span> Criar postagem
+      </h3>
+      <textarea 
+        placeholder="O que você está pensando?" 
+        class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none h-32"
+      ></textarea>
+      <div class="mt-4 flex justify-end">
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition shadow-md">
+          Publicar
+        </button>
       </div>
+    </div>
 
-      <!-- FEED -->
-      <div id="feedMsg" class="box toast" style="display:none;"></div>
-      <div id="feed"></div>
-
-    </section>
-  </main>
-
-  <footer>© 2026 ConecTexxto · Projeto em desenvolvimento</footer>
-
-  <script type="module">
-    import { supabase } from "../supabase.js";
-
-    const hello = document.getElementById("hello");
-    const desc = document.getElementById("desc");
-
-    const feed = document.getElementById("feed");
-    const feedMsg = document.getElementById("feedMsg");
-
-    const postBtn = document.getElementById("postBtn");
-    const contentInput = document.getElementById("content");
-    const postMsg = document.getElementById("postMsg");
-
-    function show(el, type, text){
-      el.className = "toast " + (type || "");
-      el.textContent = text;
-      el.style.display = "block";
-    }
-
-    // sessão
-    const { data: sessionData } = await supabase.auth.getSession();
-    const session = sessionData?.session;
-    if (!session) window.location.href = "../login/";
-    const user = session.user;
-    const userId = user.id;
-
-    // logout
-    document.getElementById("logout").onclick = async (e) => {
-      e.preventDefault();
-      await supabase.auth.signOut();
-      window.location.href = "../login/";
-    };
-
-    // pega URL pública do avatar (se existir)
-    function getAvatarUrl(uid){
-      const { data } = supabase.storage.from("avatars").getPublicUrl(`${uid}.png`);
-      // cache-buster para atualizar quando trocar foto
-      return data?.publicUrl ? `${data.publicUrl}?t=${Date.now()}` : "";
-    }
-
-    // carregar perfil
-    async function loadProfile(){
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("nome, idade, username")
-        .eq("id", userId)
-        .single();
-
-      if (error || !profile){
-        hello.textContent = "Bem-vindo(a) 👋";
-        desc.textContent = "Não consegui carregar seu perfil agora.";
-        return;
-      }
-
-      const u = profile.username ? `@${profile.username}` : "";
-      hello.textContent = `Bem-vindo(a), ${profile.nome}! 👋`;
-      desc.textContent = `Sua idade: ${profile.idade ?? "—"}. ${u ? "Seu usuário: " + u : ""}`;
-    }
-
-    // publicar post
-    postBtn.onclick = async () => {
-      postMsg.style.display = "none";
-      const content = contentInput.value.trim();
-      if (!content) return show(postMsg, "err", "Digite algo antes de publicar.");
-
-      show(postMsg, "", "Publicando...");
-
-      const { error } = await supabase.from("posts").insert({
-        user_id: userId,
-        content
-      });
-
-      if (error) return show(postMsg, "err", "Erro: " + error.message);
-
-      show(postMsg, "ok", "Publicado ✅");
-      contentInput.value = "";
-      await loadFeed();
-    };
-
-    // feed
-    async function loadFeed(){
-      feed.innerHTML = "";
-      feedMsg.style.display = "none";
-
-      const { data, error } = await supabase
-        .from("posts")
-        .select("id, content, created_at, user_id, profiles(nome, username)")
-        .order("created_at", { ascending: false });
-
-      if (error){
-        feedMsg.style.display = "block";
-        feedMsg.textContent = "Erro ao carregar feed: " + error.message;
-        return;
-      }
-
-      if (!data || data.length === 0){
-        feedMsg.style.display = "block";
-        feedMsg.textContent = "Ainda não há postagens. Seja o primeiro a postar 😊";
-        return;
-      }
-
-      for (const post of data){
-        const nome = post.profiles?.nome || "Usuário";
-        const username = post.profiles?.username ? `@${post.profiles.username}` : "@usuario";
-        const avatarUrl = getAvatarUrl(post.user_id);
-
-        const div = document.createElement("div");
-        div.className = "box post";
-
-        div.innerHTML = `
-          <div class="post-head">
-            <div class="avatar">
-              ${avatarUrl ? `<img src="${avatarUrl}" alt="avatar">` : `<span>sem</span>`}
-            </div>
-            <div class="meta">
-              <div class="name-row">
-                <div class="name">${escapeHtml(nome)}</div>
-                <div class="user">${escapeHtml(username)}</div>
-              </div>
-              <div class="time">${new Date(post.created_at).toLocaleString()}</div>
-            </div>
+    <!-- Exemplo de post (repetir com map no JS) -->
+    <div class="bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-700">
+      <div class="flex items-start gap-4">
+        <div class="w-12 h-12 bg-gray-700 rounded-full"></div> <!-- foto -->
+        <div class="flex-1">
+          <div class="flex items-center gap-2">
+            <span class="font-semibold">Rogério Felipe</span>
+            <span class="text-gray-500">@rogerioreact</span>
+            <span class="text-gray-500 text-sm">• 09/02/2026 19:00</span>
           </div>
-
-          <div class="content">${escapeHtml(post.content)}</div>
-        `;
-
-        feed.appendChild(div);
-      }
-    }
-
-    function escapeHtml(str){
-      return String(str)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    await loadProfile();
-    await loadFeed();
-  </script>
-</body>
-</html>
+          <p class="mt-2 text-gray-200">
+            Hoje estou criando uma nova rede social "ConecTexxto" 🚀
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
