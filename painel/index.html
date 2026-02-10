@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Painel - ConecTexxto</title>
   
-  <!-- Tailwind CSS CDN - essencial! -->
+  <!-- Tailwind CSS CDN (obrigatório para os estilos modernos) -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Fonte moderna Inter -->
+  <!-- Fonte Inter (limpa e moderna) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Seu script Supabase (ajuste o path se necessário) -->
+  <!-- Seu script Supabase (ajuste o caminho se necessário) -->
   <script src="../supabase.js" defer></script>
   
   <style>
@@ -20,14 +20,14 @@
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen">
 
-  <!-- Header -->
+  <!-- Header corrigido: link "Início" aponta para raiz do projeto -->
   <header class="bg-gray-950 border-b border-gray-800 sticky top-0 z-10 shadow-md">
     <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
       <h1 class="text-2xl md:text-3xl font-bold text-blue-400 tracking-tight">ConecTexxto</h1>
-      <nav class="flex gap-6 text-gray-300">
-        <a href="/" class="hover:text-white transition duration-200">Início</a>
-        <a href="/perfil/" class="hover:text-white transition duration-200">Perfil</a>
-        <a href="#" onclick="supabase?.auth?.signOut()?.then(() => location.href='/') || location.href='/'" class="hover:text-red-400 transition duration-200">Sair</a>
+      <nav class="flex gap-6 md:gap-8 text-gray-300 text-base">
+        <a href="../" class="hover:text-white transition duration-200">Início</a>
+        <a href="../perfil/" class="hover:text-white transition duration-200">Perfil</a>
+        <a href="#" onclick="supabase?.auth?.signOut()?.then(() => location.href='../') || location.href='../'" class="hover:text-red-400 transition duration-200">Sair</a>
       </nav>
     </div>
   </header>
@@ -36,7 +36,7 @@
   <main class="bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 min-h-screen py-8">
     <div class="max-w-3xl mx-auto px-4">
       
-      <!-- Boas-vindas -->
+      <!-- Card de boas-vindas -->
       <div class="bg-gray-800/70 backdrop-blur-lg border border-gray-700 rounded-2xl shadow-2xl p-6 mb-10">
         <div class="flex items-center gap-4">
           <div class="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-2xl font-bold shadow-md">
@@ -49,7 +49,7 @@
         </div>
       </div>
 
-      <!-- Criar postagem -->
+      <!-- Área para criar postagem -->
       <div class="bg-gray-800/80 backdrop-blur-md border border-gray-700 rounded-2xl shadow-xl p-6 mb-10">
         <h3 class="text-lg font-medium mb-4 flex items-center gap-2">
           <span class="text-blue-400 text-xl">✍️</span> Criar postagem
@@ -61,7 +61,7 @@
         ></textarea>
         <div class="mt-4 flex justify-end">
           <button 
-            onclick="alert('Post publicado! (adicione lógica Supabase aqui)'); document.getElementById('postContent').value='';"
+            onclick="alert('Post publicado! Implemente o insert no Supabase aqui.'); document.getElementById('postContent').value = '';"
             class="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-xl font-medium transition duration-300 shadow-lg"
           >
             Publicar
@@ -69,7 +69,7 @@
         </div>
       </div>
 
-      <!-- Post exemplo -->
+      <!-- Post de exemplo (depois virá dinâmico) -->
       <div class="bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-700 hover:bg-gray-750 transition duration-300">
         <div class="flex items-start gap-4">
           <div class="w-12 h-12 bg-gray-700 rounded-full flex-shrink-0"></div>
@@ -85,6 +85,7 @@
           </div>
         </div>
       </div>
+
     </div>
   </main>
 
