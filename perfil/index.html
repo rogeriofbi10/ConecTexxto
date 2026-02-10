@@ -8,7 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Carrega supabase.js SEM defer -->
+  <!-- Carrega supabase.js sem defer para garantir ordem -->
   <script src="../supabase.js"></script>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen font-sans">
@@ -25,19 +25,19 @@
       <a href="/ConecTexxto/" class="text-blue-400 hover:text-blue-300 transition duration-200 mb-6 inline-block text-lg font-medium">← Voltar para Início</a>
       
       <div class="bg-gray-800/80 backdrop-blur-lg border border-gray-700 rounded-3xl shadow-2xl p-8 md:p-10">
-        <h1 class="text-3xl font-bold mb-8 text-center">Seu Perfil</h1>
+        <h1 class="text-3xl font-bold mb-10 text-center">Seu Perfil</h1>
         
-        <div class="grid md:grid-cols-2 gap-8">
-          <!-- Foto -->
-          <div class="flex flex-col items-center space-y-4">
-            <div class="w-48 h-48 rounded-2xl overflow-hidden border-4 border-blue-500 shadow-xl">
-              <img id="preview" src="https://via.placeholder.com/300?text=Clique+para+carregar" alt="Foto de perfil" class="w-full h-full object-cover">
+        <div class="grid md:grid-cols-2 gap-12">
+          <!-- Foto e upload -->
+          <div class="flex flex-col items-center space-y-6">
+            <div class="w-48 h-48 md:w-64 md:h-64 rounded-2xl overflow-hidden border-4 border-blue-500 shadow-2xl">
+              <img id="preview" src="https://via.placeholder.com/400x400?text=Clique+para+carregar+sua+foto" alt="Foto de perfil" class="w-full h-full object-cover">
             </div>
-            <label class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-xl cursor-pointer transition duration-300 shadow-md text-center w-full max-w-xs">
+            <label class="bg-gray-700 hover:bg-gray-600 text-white px-8 py-4 rounded-xl cursor-pointer transition duration-300 shadow-md text-center w-full max-w-sm font-medium">
               Escolher foto (JPG/PNG)
               <input type="file" accept="image/jpeg,image/png" id="fotoInput" class="hidden">
             </label>
-            <p class="text-sm text-gray-400 text-center">Prévia aparece aqui. Salve para enviar ao servidor.</p>
+            <p class="text-sm text-gray-400 text-center">A prévia aparece imediatamente. Clique em Salvar para enviar ao servidor.</p>
           </div>
           
           <!-- Campos -->
@@ -61,7 +61,7 @@
           </div>
         </div>
         
-        <div class="mt-10 flex justify-end gap-4">
+        <div class="mt-12 flex flex-col sm:flex-row justify-end gap-4">
           <button onclick="history.back()" class="bg-gray-700 hover:bg-gray-600 px-8 py-3 rounded-xl transition duration-300">Voltar</button>
           <button id="salvarBtn" class="bg-blue-600 hover:bg-blue-700 px-10 py-3 rounded-xl font-medium transition duration-300 shadow-lg">Salvar Alterações</button>
         </div>
@@ -70,7 +70,7 @@
   </main>
 
   <script>
-    // Função para esperar supabase estar pronto
+    // Aguarda supabase estar disponível
     function waitForSupabase(callback) {
       if (window.supabase) {
         callback();
@@ -80,9 +80,9 @@
     }
 
     waitForSupabase(() => {
-      console.log("Supabase carregado com sucesso!");
+      console.log("Supabase carregado OK!");
 
-      // Preview da foto
+      // Preview da foto (deve funcionar agora)
       document.getElementById('fotoInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -94,7 +94,7 @@
         }
       });
 
-      // Botão Salvar
+      // Salvar alterações
       document.getElementById('salvarBtn').addEventListener('click', async () => {
         const btn = document.getElementById('salvarBtn');
         btn.disabled = true;
@@ -112,7 +112,7 @@
           const fileInput = document.getElementById('fotoInput');
           let avatarUrl = null;
 
-          // Upload foto
+          // Upload foto se selecionada
           if (fileInput.files.length > 0) {
             const file = fileInput.files[0];
             const fileExt = file.name.split('.').pop();
@@ -128,7 +128,7 @@
             avatarUrl = urlData.publicUrl;
           }
 
-          // Salvar dados no banco
+          // Salva dados no banco
           const { error } = await supabase
             .from('profiles')
             .upsert({
@@ -137,13 +137,13 @@
               username,
               age: idade,
               phone: telefone,
-              avatar_url: avatarUrl
+              avatar_url: avatarUrl || undefined
             }, { onConflict: 'user_id' });
 
           if (error) throw error;
 
-          alert('Perfil salvo com sucesso!');
-          location.reload();  // Atualiza para mostrar nova foto se for do banco
+          alert('Perfil salvo com sucesso! Recarregando...');
+          location.reload();
         } catch (err) {
           console.error('Erro ao salvar:', err);
           alert('Erro ao salvar: ' + err.message);
