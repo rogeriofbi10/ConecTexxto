@@ -42,7 +42,7 @@
               <input id="nome" type="text" value="Rogério Felipe" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
             </div>
             <div>
-              <label class="block text-sm font-medium mb-2 text-gray-300">@username (único - mude se der erro de duplicado)</label>
+              <label class="block text-sm font-medium mb-2 text-gray-300">@username (único - mude para novo se der erro)</label>
               <input id="username" type="text" value="rogerioreact" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
             </div>
             <div>
@@ -128,7 +128,7 @@
         if (error) throw error;
 
         alert('Perfil salvo com sucesso!');
-        location.reload(); // Mostra foto nova
+        location.reload();
       } catch (err) {
         console.error('Erro ao salvar:', err);
         alert('Erro ao salvar: ' + err.message);
