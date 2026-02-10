@@ -2,229 +2,154 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Perfil | ConecTexxto</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../styles.css">
-
-  <style>
-    .wrap{min-height:calc(100vh - 70px - 64px);padding:28px 20px 60px;}
-    .panel{max-width:900px;margin:0 auto;}
-    .box{background:#081426;border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 10px 25px rgba(0,0,0,.35);}
-    .grid{display:grid;grid-template-columns:1fr;gap:16px;}
-    @media(min-width:900px){.grid{grid-template-columns:320px 1fr;}}
-    .avatar{
-      width:140px;height:140px;border-radius:18px;
-      background:#050B18;border:1px solid rgba(30,144,255,.35);
-      overflow:hidden;display:flex;align-items:center;justify-content:center;
-    }
-    .avatar img{width:100%;height:100%;object-fit:cover;display:block;}
-    .field{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
-    .field label{font-size:14px;opacity:.9;}
-    .field input{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(30,144,255,.35);background:#050B18;color:#F5F7FA;outline:none;}
-    .field input:focus{border-color:#1E90FF;box-shadow:0 0 0 3px rgba(30,144,255,.15);}
-    .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;}
-    .btn2{padding:10px 16px;border-radius:10px;border:none;background:#1E90FF;color:#fff;font-weight:600;cursor:pointer;}
-    .btn2:hover{filter:brightness(.95);}
-    .muted{opacity:.75;font-size:13px;line-height:1.5;}
-    .toast{margin-top:12px;padding:12px;border-radius:12px;background:rgba(255,255,255,.06);display:none;}
-    .toast.ok{border:1px solid rgba(0,200,120,.35);}
-    .toast.err{border:1px solid rgba(255,80,80,.35);}
-    .hint{font-size:13px;opacity:.8;margin-top:6px;}
-    .navmini{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;}
-    .navmini a{color:#F5F7FA;text-decoration:none;opacity:.9}
-    .navmini a:hover{opacity:1;text-decoration:underline}
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Perfil - ConecTexxto</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CDN do Supabase JS v2 -->
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+    window.createSupabaseClient = createClient;
+  </script>
 </head>
+<body class="bg-gray-950 text-gray-100 min-h-screen font-sans">
 
-<body>
-  <header>
-    <div class="logo">Conec<span>Texxto</span></div>
-    <nav>
-      <a href="../">Início</a>
-      <a href="../painel/" class="btn">Painel</a>
-      <a href="#" id="logout" class="btn">Sair</a>
-    </nav>
+  <!-- Seu header e main (igual ao anterior, com todos os campos) -->
+  <header class="bg-gray-950 border-b border-gray-800 sticky top-0 z-10 shadow-md">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-2xl md:text-3xl font-bold text-blue-400 tracking-tight">ConecTexxto</h1>
+      <a href="/ConecTexxto/" class="text-gray-300 hover:text-white transition duration-200">Início</a>
+    </div>
   </header>
 
-  <main class="wrap">
-    <section class="panel">
-
-      <div class="box">
-        <h2>Seu perfil</h2>
-        <div class="navmini">
-          <a href="../painel/">← Voltar</a>
-        </div>
-        <p class="muted">Aqui você define seu <b>@username</b> e sua foto. Isso prepara tudo pro feed mostrar perfil completo.</p>
-      </div>
-
-      <div class="grid">
-        <div class="box">
-          <div class="avatar" id="avatarBox">
-            <span class="muted">Sem foto</span>
+  <main class="bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 min-h-screen py-10">
+    <div class="max-w-4xl mx-auto px-4">
+      <a href="/ConecTexxto/" class="text-blue-400 hover:text-blue-300 transition duration-200 mb-6 inline-block text-lg font-medium">← Voltar para Início</a>
+      
+      <div class="bg-gray-800/80 backdrop-blur-lg border border-gray-700 rounded-3xl shadow-2xl p-8 md:p-10">
+        <h1 class="text-3xl font-bold mb-10 text-center">Seu Perfil</h1>
+        
+        <div class="grid md:grid-cols-2 gap-10">
+          <div class="flex flex-col items-center space-y-6">
+            <div class="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden border-4 border-blue-500 shadow-2xl hover:scale-105 transition duration-300">
+              <img id="preview" src="https://via.placeholder.com/300?text=Carregue+sua+foto" alt="Foto de perfil" class="w-full h-full object-cover">
+            </div>
+            <label class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-xl cursor-pointer transition duration-300 shadow-md text-center w-full max-w-xs">
+              Escolher foto (JPG/PNG)
+              <input type="file" accept="image/jpeg,image/png" id="fotoInput" class="hidden">
+            </label>
+            <p class="text-sm text-gray-400 text-center">Prévia aparece imediatamente. Clique em Salvar para enviar.</p>
           </div>
-
-          <div style="margin-top:14px;">
-            <div class="field">
-              <label>Foto de perfil (JPG/PNG)</label>
-              <input id="avatarFile" type="file" accept="image/*">
-              <div class="hint">Dica: depois de enviar, recarregue a página se necessário.</div>
+          
+          <div class="space-y-6">
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-300">Nome</label>
+              <input id="nome" type="text" value="Rogério Felipe" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
             </div>
-            <button class="btn2" id="btnUpload">Enviar foto</button>
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-300">@username (único)</label>
+              <input id="username" type="text" value="rogerioreact" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-300">Idade</label>
+              <input id="idade" type="number" value="34" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-300">Telefone (opcional)</label>
+              <input id="telefone" type="tel" value="21972841918" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+            </div>
           </div>
-
-          <div id="upMsg" class="toast"></div>
         </div>
-
-        <div class="box">
-          <form id="form">
-            <div class="field">
-              <label>Nome</label>
-              <input id="nome" type="text" required>
-            </div>
-
-            <div class="field">
-              <label>@username (único)</label>
-              <input id="username" type="text" placeholder="ex: rogeriofelipe" required>
-              <div class="hint">Sem espaço. Pode usar letras, números, ponto e underline.</div>
-            </div>
-
-            <div class="field">
-              <label>Idade</label>
-              <input id="idade" type="number" min="0" max="120">
-            </div>
-
-            <div class="field">
-              <label>Telefone</label>
-              <input id="telefone" type="tel">
-            </div>
-
-            <div class="row">
-              <button class="btn2" type="submit">Salvar</button>
-              <a class="btn2" href="../painel/" style="text-decoration:none;display:inline-flex;align-items:center;">Voltar</a>
-            </div>
-
-            <div id="msg" class="toast"></div>
-          </form>
+        
+        <div class="mt-12 flex justify-end gap-4">
+          <button onclick="history.back()" class="bg-gray-700 hover:bg-gray-600 px-8 py-3 rounded-xl transition duration-300">Voltar</button>
+          <button id="salvarBtn" class="bg-blue-600 hover:bg-blue-700 px-10 py-3 rounded-xl font-medium transition duration-300 shadow-lg">Salvar Alterações</button>
         </div>
       </div>
-
-    </section>
+    </div>
   </main>
 
-  <footer>© 2026 ConecTexxto · Projeto em desenvolvimento</footer>
-
-  <script type="module">
-    import { supabase } from "../supabase.js";
-
-    const msg = document.getElementById("msg");
-    const upMsg = document.getElementById("upMsg");
-    const avatarBox = document.getElementById("avatarBox");
-
-    function show(el, type, text){
-      el.className = "toast " + (type || "");
-      el.textContent = text;
-      el.style.display = "block";
-    }
-
-    function cleanUsername(raw){
-      return raw
-        .trim()
-        .toLowerCase()
-        .replace(/^@+/, "")
-        .replace(/\s+/g, "")
-        .replace(/[^a-z0-9._]/g, "");
-    }
-
-    // sessão
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) window.location.href = "../login/";
-    const userId = session.user.id;
-
-    // logout
-    document.getElementById("logout").onclick = async (e) => {
-      e.preventDefault();
-      await supabase.auth.signOut();
-      window.location.href = "../login/";
-    };
-
-    // carregar perfil
-    async function load(){
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("nome, idade, telefone, username")
-        .eq("id", userId)
-        .single();
-
-      if (profile){
-        document.getElementById("nome").value = profile.nome ?? "";
-        document.getElementById("idade").value = profile.idade ?? "";
-        document.getElementById("telefone").value = profile.telefone ?? "";
-        document.getElementById("username").value = profile.username ?? "";
+  <script>
+    // Preview foto
+    document.getElementById('fotoInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          document.getElementById('preview').src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
       }
-
-      // carrega avatar se existir
-      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(`${userId}.png`);
-      if (pub?.publicUrl){
-        avatarBox.innerHTML = `<img src="${pub.publicUrl}?t=${Date.now()}" alt="avatar">`;
-      }
-    }
-
-    await load();
-
-    // salvar perfil
-    document.getElementById("form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      msg.style.display = "none";
-
-      const nome = document.getElementById("nome").value.trim();
-      const idade = Number(document.getElementById("idade").value || 0);
-      const telefone = document.getElementById("telefone").value.trim();
-      const username = cleanUsername(document.getElementById("username").value);
-
-      if (!nome) return show(msg, "err", "Nome é obrigatório.");
-      if (!username) return show(msg, "err", "Username é obrigatório.");
-
-      // valida formato
-      if (!/^[a-z0-9._]{3,20}$/.test(username)){
-        return show(msg, "err", "Username inválido (3 a 20, letras/números/ponto/underline).");
-      }
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({ nome, idade: idade || null, telefone, username })
-        .eq("id", userId);
-
-      if (error){
-        // conflito de username (unique)
-        if (String(error.message).toLowerCase().includes("duplicate")){
-          return show(msg, "err", "Esse @username já existe. Tente outro.");
-        }
-        return show(msg, "err", error.message);
-      }
-
-      show(msg, "ok", "Perfil salvo ✅");
     });
 
-    // upload avatar
-    document.getElementById("btnUpload").addEventListener("click", async () => {
-      upMsg.style.display = "none";
-      const file = document.getElementById("avatarFile").files?.[0];
-      if (!file) return show(upMsg, "err", "Escolha uma imagem primeiro.");
+    // Salvar
+    document.getElementById('salvarBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('salvarBtn');
+      btn.disabled = true;
+      btn.innerText = 'Salvando...';
 
-      // sempre salva como png (simples). Se preferir manter original, eu ajusto depois.
-      const filePath = `${userId}.png`;
+      try {
+        // Cria o client usando o import do CDN
+        const { createClient } = window.supabase;  // ou use await import se necessário
+        const supabase = createClient(
+          "https://peoinxkkmeemlmgpugbv.supabase.co",
+          "sb_publishable_Wp8oZnHe8C9EdwJdV3satw_NF6KXdk4"
+        );
 
-      const { error } = await supabase.storage
-        .from("avatars")
-        .upload(filePath, file, { upsert: true, contentType: file.type });
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (!session) throw new Error('Sessão não encontrada. Faça login novamente.');
 
-      if (error) return show(upMsg, "err", error.message);
+        // Resto do código de upload e upsert (igual ao anterior)
+        const userId = session.user.id;
+        const nome = document.getElementById('nome').value.trim();
+        const username = document.getElementById('username').value.trim();
+        const idade = parseInt(document.getElementById('idade').value) || null;
+        const telefone = document.getElementById('telefone').value.trim() || null;
+        const fileInput = document.getElementById('fotoInput');
+        let avatarUrl = null;
 
-      show(upMsg, "ok", "Foto enviada ✅");
-      await load();
+        if (fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          const fileExt = file.name.split('.').pop();
+          const filePath = `profiles/${userId}.${fileExt}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(filePath, file, { upsert: true });
+
+          if (uploadError) throw uploadError;
+
+          const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+          avatarUrl = urlData.publicUrl;
+        }
+
+        const { error } = await supabase
+          .from('profiles')
+          .upsert({
+            user_id: userId,
+            full_name: nome,
+            username,
+            age: idade,
+            phone: telefone,
+            avatar_url: avatarUrl || undefined
+          }, { onConflict: 'user_id' });
+
+        if (error) throw error;
+
+        alert('Perfil salvo com sucesso!');
+        location.reload();
+      } catch (err) {
+        console.error('Erro completo:', err);
+        alert('Erro ao salvar: ' + (err.message || 'Verifique o console (F12)'));
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Salvar Alterações';
+      }
     });
   </script>
+
 </body>
 </html>
