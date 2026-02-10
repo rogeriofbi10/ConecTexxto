@@ -42,7 +42,7 @@
               <input id="nome" type="text" value="Rogério Felipe" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
             </div>
             <div>
-              <label class="block text-sm font-medium mb-2 text-gray-300">@username (único - mude para novo se der erro)</label>
+              <label class="block text-sm font-medium mb-2 text-gray-300">@username (único - mude para novo)</label>
               <input id="username" type="text" value="rogerioreact" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
             </div>
             <div>
@@ -67,7 +67,7 @@
   <script type="module">
     import { supabase } from "../supabase.js";
 
-    // Preview imediato da foto
+    // Preview da foto
     document.getElementById('fotoInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -79,7 +79,7 @@
       }
     });
 
-    // Salvar perfil + foto
+    // Salvar
     document.getElementById('salvarBtn').addEventListener('click', async () => {
       const btn = document.getElementById('salvarBtn');
       btn.disabled = true;
@@ -87,7 +87,7 @@
 
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session) throw new Error('Você precisa estar logado. Faça login novamente.');
+        if (!session) throw new Error('Você precisa estar logado.');
 
         const userId = session.user.id;
         const nome = document.getElementById('nome').value.trim();
@@ -97,7 +97,6 @@
         const fileInput = document.getElementById('fotoInput');
         let avatarUrl = null;
 
-        // Upload foto
         if (fileInput.files.length > 0) {
           const file = fileInput.files[0];
           const fileExt = file.name.split('.').pop();
@@ -113,7 +112,6 @@
           avatarUrl = urlData.publicUrl + `?t=${Date.now()}`;
         }
 
-        // Salva dados (usando nomes exatos da sua tabela)
         const { error } = await supabase
           .from('profiles')
           .upsert({
