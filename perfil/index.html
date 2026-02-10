@@ -25,7 +25,6 @@
         <h1 class="text-3xl font-bold mb-10 text-center">Seu Perfil</h1>
         
         <div class="grid md:grid-cols-2 gap-10">
-          <!-- Foto -->
           <div class="flex flex-col items-center space-y-6">
             <div class="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden border-4 border-blue-500 shadow-2xl hover:scale-105 transition duration-300">
               <img id="preview" src="https://via.placeholder.com/300?text=Carregue+sua+foto" alt="Foto de perfil" class="w-full h-full object-cover">
@@ -37,7 +36,6 @@
             <p class="text-sm text-gray-400 text-center">Prévia aparece imediatamente. Clique em Salvar para enviar.</p>
           </div>
           
-          <!-- Campos -->
           <div class="space-y-6">
             <div>
               <label class="block text-sm font-medium mb-2 text-gray-300">Nome</label>
@@ -69,7 +67,6 @@
   <script type="module">
     import { supabase } from "../supabase.js";
 
-    // Preview imediato da foto (sempre funciona)
     document.getElementById('fotoInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -81,7 +78,6 @@
       }
     });
 
-    // Salvar perfil e foto
     document.getElementById('salvarBtn').addEventListener('click', async () => {
       const btn = document.getElementById('salvarBtn');
       btn.disabled = true;
@@ -89,7 +85,7 @@
 
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session) throw new Error('Você precisa estar logado. Faça login novamente.');
+        if (!session) throw new Error('Você precisa estar logado.');
 
         const userId = session.user.id;
         const nome = document.getElementById('nome').value.trim();
@@ -99,7 +95,6 @@
         const fileInput = document.getElementById('fotoInput');
         let avatarUrl = null;
 
-        // Upload da foto se selecionada
         if (fileInput.files.length > 0) {
           const file = fileInput.files[0];
           const fileExt = file.name.split('.').pop();
@@ -115,22 +110,21 @@
           avatarUrl = urlData.publicUrl + `?t=${Date.now()}`;
         }
 
-        // Salva dados
         const { error } = await supabase
           .from('profiles')
           .upsert({
             user_id: userId,
-            full_name: nome,
+            nome,  // nome correto da coluna
             username,
-            age: idade,
-            phone: telefone,
+            idade,  // nome correto da coluna
+            telefone,
             avatar_url: avatarUrl || undefined
           }, { onConflict: 'user_id' });
 
         if (error) throw error;
 
         alert('Perfil salvo com sucesso!');
-        location.reload(); // Mostra foto nova
+        location.reload();
       } catch (err) {
         console.error('Erro ao salvar:', err);
         alert('Erro ao salvar: ' + err.message);
