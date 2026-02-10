@@ -8,8 +8,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Carrega supabase.js -->
-  <script src="../supabase.js"></script>
+  <!-- CDN direto do Supabase JS v2 (fallback se arquivo local falhar) -->
+  <script src="https://esm.sh/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen font-sans">
 
@@ -28,7 +28,6 @@
         <h1 class="text-3xl font-bold mb-10 text-center">Seu Perfil</h1>
         
         <div class="grid md:grid-cols-2 gap-10">
-          <!-- Foto e upload -->
           <div class="flex flex-col items-center space-y-6">
             <div class="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden border-4 border-blue-500 shadow-2xl hover:scale-105 transition duration-300">
               <img id="preview" src="https://via.placeholder.com/300?text=Carregue+sua+foto" alt="Foto de perfil" class="w-full h-full object-cover">
@@ -40,7 +39,6 @@
             <p class="text-sm text-gray-400 text-center">Prévia aparece imediatamente. Clique em Salvar para enviar.</p>
           </div>
           
-          <!-- Campos -->
           <div class="space-y-6">
             <div>
               <label class="block text-sm font-medium mb-2 text-gray-300">Nome</label>
@@ -70,7 +68,7 @@
   </main>
 
   <script>
-    // Preview da foto (roda independente do Supabase)
+    // Preview da foto - roda independente
     document.getElementById('fotoInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -82,18 +80,18 @@
       }
     });
 
-    // Salvar (tenta usar supabase quando disponível)
+    // Salvar
     document.getElementById('salvarBtn').addEventListener('click', async () => {
       const btn = document.getElementById('salvarBtn');
       btn.disabled = true;
       btn.innerText = 'Salvando...';
 
       try {
-        if (typeof supabase === 'undefined' || !supabase) {
-          throw new Error('Supabase não carregou. Verifique o arquivo supabase.js');
-        }
+        // Usa o global do CDN esm.sh
+        const { createClient } = supabase; // supabase é global do script CDN
+        const supabaseClient = createClient("https://peoinxkkmeemlmgpugbv.supabase.co", "sb_publishable_Wp8oZnHe8C9EdwJdV3satw_NF6KXdk4");
 
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) throw new Error('Você precisa estar logado');
 
         const userId = session.user.id;
@@ -104,24 +102,22 @@
         const fileInput = document.getElementById('fotoInput');
         let avatarUrl = null;
 
-        // Upload da foto
         if (fileInput.files.length > 0) {
           const file = fileInput.files[0];
           const fileExt = file.name.split('.').pop();
           const filePath = `profiles/${userId}.${fileExt}`;
 
-          const { error: uploadError } = await supabase.storage
+          const { error: uploadError } = await supabaseClient.storage
             .from('avatars')
             .upload(filePath, file, { upsert: true });
 
           if (uploadError) throw uploadError;
 
-          const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+          const { data: urlData } = supabaseClient.storage.from('avatars').getPublicUrl(filePath);
           avatarUrl = urlData.publicUrl;
         }
 
-        // Salva dados no banco
-        const { error } = await supabase
+        const { error } = await supabaseClient
           .from('profiles')
           .upsert({
             user_id: userId,
