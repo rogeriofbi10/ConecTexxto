@@ -1,62 +1,83 @@
-<!-- Header fixo ou sticky -->
-<header class="bg-gray-950 border-b border-gray-800 sticky top-0 z-10">
-  <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
-    <h1 class="text-2xl font-bold text-blue-400">ConecTexxto</h1>
-    <nav class="flex gap-6 text-gray-300">
-      <a href="/" class="hover:text-white transition">Início</a>
-      <a href="/perfil/" class="hover:text-white transition">Perfil</a>
-      <a href="#" onclick="logout()" class="hover:text-red-400 transition">Sair</a>
+<!-- Header -->
+<header class="bg-gray-950 border-b border-gray-800 sticky top-0 z-10 shadow-md">
+  <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+    <h1 class="text-2xl md:text-3xl font-bold text-blue-400 tracking-tight">ConecTexxto</h1>
+    <nav class="flex gap-6 md:gap-8 text-gray-300 text-sm md:text-base">
+      <a href="/" class="hover:text-white transition duration-200">Início</a>
+      <a href="/perfil/" class="hover:text-white transition duration-200">Perfil</a>
+      <a href="#" onclick="supabase.auth.signOut().then(() => location.href='/')" class="hover:text-red-400 transition duration-200">Sair</a>
     </nav>
   </div>
 </header>
 
-<!-- Conteúdo principal -->
-<main class="bg-gradient-to-b from-gray-950 to-gray-900 min-h-screen text-gray-100">
+<!-- Main content -->
+<main class="bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 min-h-screen">
   <div class="max-w-3xl mx-auto px-4 py-8">
-    <!-- Boas-vindas card -->
-    <div class="bg-gray-800/70 backdrop-blur-lg rounded-2xl shadow-2xl p-6 mb-8 border border-gray-700">
+    
+    <!-- Card de boas-vindas -->
+    <div class="bg-gray-800/70 backdrop-blur-lg border border-gray-700 rounded-2xl shadow-2xl p-6 mb-10">
       <div class="flex items-center gap-4">
-        <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-2xl font-bold">
-          RF <!-- ou <img src="sua-foto.jpg" class="rounded-full w-full h-full object-cover"> -->
+        <div class="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-2xl font-bold shadow-md">
+          RF
         </div>
         <div>
-          <h2 class="text-2xl font-semibold">Bem-vindo(a), Rogério Felipe! 👋</h2>
-          <p class="text-gray-400">Idade: 34 | @rogerioreact</p>
+          <h2 class="text-xl md:text-2xl font-semibold">Bem-vindo(a), Rogério Felipe! 👋</h2>
+          <p class="text-gray-400 mt-1">Sua idade: 34 | Seu usuário: @rogerioreact</p>
         </div>
       </div>
     </div>
 
     <!-- Criar postagem -->
-    <div class="bg-gray-800 rounded-2xl shadow-xl p-6 mb-10 border border-gray-700">
+    <div class="bg-gray-800/80 backdrop-blur-md border border-gray-700 rounded-2xl shadow-xl p-6 mb-10">
       <h3 class="text-lg font-medium mb-4 flex items-center gap-2">
-        <span class="text-blue-400">✍️</span> Criar postagem
+        <span class="text-blue-400 text-xl">✍️</span> Criar postagem
       </h3>
       <textarea 
+        id="postContent"
         placeholder="O que você está pensando?" 
-        class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none h-32"
+        class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none h-32 transition duration-200"
       ></textarea>
       <div class="mt-4 flex justify-end">
-        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition shadow-md">
+        <button 
+          onclick="publicarPost()" 
+          class="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-xl font-medium transition duration-300 shadow-lg"
+        >
           Publicar
         </button>
       </div>
     </div>
 
-    <!-- Exemplo de post (repetir com map no JS) -->
-    <div class="bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-700">
-      <div class="flex items-start gap-4">
-        <div class="w-12 h-12 bg-gray-700 rounded-full"></div> <!-- foto -->
-        <div class="flex-1">
-          <div class="flex items-center gap-2">
-            <span class="font-semibold">Rogério Felipe</span>
-            <span class="text-gray-500">@rogerioreact</span>
-            <span class="text-gray-500 text-sm">• 09/02/2026 19:00</span>
+    <!-- Posts (exemplo estático – depois virá dinâmico com Supabase) -->
+    <div class="space-y-6">
+      <div class="bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-700 hover:bg-gray-750 transition duration-300">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 bg-gray-700 rounded-full flex-shrink-0"></div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-semibold">Rogério Felipe</span>
+              <span class="text-gray-500">@rogerioreact</span>
+              <span class="text-gray-500 text-sm">• 09/02/2026 19:00</span>
+            </div>
+            <p class="mt-2 text-gray-200 leading-relaxed">
+              Hoje estou criando uma nova rede social "ConecTexxto" 🚀
+            </p>
           </div>
-          <p class="mt-2 text-gray-200">
-            Hoje estou criando uma nova rede social "ConecTexxto" 🚀
-          </p>
         </div>
       </div>
+      <!-- Adicione mais <div> de posts aqui quando puxar do banco -->
     </div>
   </div>
 </main>
+
+<!-- Script simples para publicar (exemplo – adapte com sua função Supabase) -->
+<script>
+  function publicarPost() {
+    const conteudo = document.getElementById('postContent').value.trim();
+    if (conteudo) {
+      alert('Post publicado! (implemente insert no Supabase aqui)');
+      document.getElementById('postContent').value = '';
+    } else {
+      alert('Escreva algo antes de publicar!');
+    }
+  }
+</script>
