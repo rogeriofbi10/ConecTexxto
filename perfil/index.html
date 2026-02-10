@@ -7,11 +7,9 @@
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="../supabase.js" defer></script>
   
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-  </style>
+  <!-- Carrega supabase.js SEM defer para garantir disponibilidade imediata -->
+  <script src="../supabase.js"></script>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen">
 
@@ -72,94 +70,101 @@
   </main>
 
   <script>
-    // Preview foto local
-    document.getElementById('fotoInput').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-          document.getElementById('preview').src = ev.target.result;
-        };
-        reader.readAsDataURL(file);
+    // Espera supabase carregar (caso ainda dê problema)
+    window.addEventListener('load', () => {
+      if (typeof supabase === 'undefined') {
+        alert('Erro: supabase não carregou. Verifique o caminho ../supabase.js');
+        return;
       }
-    });
 
-    // Salvar perfil (foto + dados)
-    document.getElementById('salvarBtn').addEventListener('click', async () => {
-      const btn = document.getElementById('salvarBtn');
-      btn.disabled = true;
-      btn.textContent = 'Salvando...';
-
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) throw new Error('Não logado');
-
-        const userId = session.user.id;
-        const nome = document.getElementById('nome').value.trim();
-        const username = document.getElementById('username').value.trim();
-        const idade = parseInt(document.getElementById('idade').value);
-        const telefone = document.getElementById('telefone').value.trim();
-        const fileInput = document.getElementById('fotoInput');
-        let avatarUrl = null;
-
-        // Upload foto se selecionada
-        if (fileInput.files.length > 0) {
-          const file = fileInput.files[0];
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${userId}.${fileExt}`;
-          const filePath = `profiles/${fileName}`;
-
-          const { error: uploadError } = await supabase.storage
-            .from('avatars')
-            .upload(filePath, file, { upsert: true });
-
-          if (uploadError) throw uploadError;
-
-          const { data: publicUrl } = supabase.storage.from('avatars').getPublicUrl(filePath);
-          avatarUrl = publicUrl.publicUrl;
+      // Preview foto local
+      document.getElementById('fotoInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            document.getElementById('preview').src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
         }
+      });
 
-        // Atualiza ou insere no banco
-        const { error } = await supabase
-          .from('profiles')
-          .upsert({
-            user_id: userId,
-            full_name: nome,
-            username,
-            age: idade,
-            phone: telefone,
-            avatar_url: avatarUrl || undefined  // só atualiza se mudou
-          }, { onConflict: 'user_id' });
+      // Salvar perfil
+      document.getElementById('salvarBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('salvarBtn');
+        btn.disabled = true;
+        btn.textContent = 'Salvando...';
 
-        if (error) throw error;
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session) throw new Error('Você precisa estar logado');
 
-        alert('Perfil salvo com sucesso!');
-        // Opcional: recarregar para mostrar foto nova do banco
-        location.reload();
-      } catch (err) {
-        console.error(err);
-        alert('Erro ao salvar: ' + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Salvar Alterações';
+          const userId = session.user.id;
+          const nome = document.getElementById('nome').value.trim();
+          const username = document.getElementById('username').value.trim();
+          const idade = parseInt(document.getElementById('idade').value) || null;
+          const telefone = document.getElementById('telefone').value.trim() || null;
+          const fileInput = document.getElementById('fotoInput');
+          let avatarUrl = null;
+
+          // Upload foto se selecionada
+          if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${userId}.${fileExt}`;
+            const filePath = `profiles/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+              .from('avatars')  // ← Mude se seu bucket tiver outro nome
+              .upload(filePath, file, { upsert: true });
+
+            if (uploadError) throw uploadError;
+
+            const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+            avatarUrl = urlData.publicUrl;
+          }
+
+          // Upsert no banco (ajuste tabela/colunas se diferente)
+          const { error } = await supabase
+            .from('profiles')
+            .upsert({
+              user_id: userId,
+              full_name: nome,
+              username,
+              age: idade,
+              phone: telefone,
+              avatar_url: avatarUrl || undefined
+            }, { onConflict: 'user_id' });
+
+          if (error) throw error;
+
+          alert('Perfil salvo com sucesso!');
+          location.reload();  // Recarrega para atualizar visual
+        } catch (err) {
+          console.error('Erro ao salvar:', err);
+          alert('Erro ao salvar: ' + (err.message || 'Verifique o console'));
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Salvar Alterações';
+        }
+      });
+
+      // Check auth
+      async function checkAuth() {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = '/ConecTexxto/';
+        }
       }
+
+      supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_OUT') {
+          window.location.href = '/ConecTexxto/';
+        }
+      });
+
+      checkAuth();
     });
-
-    // Verifica login
-    async function checkAuth() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        window.location.href = '/ConecTexxto/';
-      }
-    }
-
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
-        window.location.href = '/ConecTexxto/';
-      }
-    });
-
-    checkAuth();
   </script>
 
 </body>
