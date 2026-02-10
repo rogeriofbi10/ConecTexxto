@@ -24,7 +24,6 @@
 
   <main class="bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 min-h-screen py-10">
     <div class="max-w-4xl mx-auto px-4">
-      <!-- Link corrigido aqui -->
       <a href="../" class="text-blue-400 hover:text-blue-300 transition duration-200 mb-6 inline-block text-lg font-medium">← Voltar para Início</a>
       
       <div class="bg-gray-800/80 backdrop-blur-lg border border-gray-700 rounded-3xl shadow-2xl p-8 md:p-10">
@@ -71,6 +70,15 @@
   </main>
 
   <script>
+    // Verifica se está logado - redireciona se não estiver
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '../';
+      }
+    }
+
+    // Preview da foto
     document.getElementById('fotoInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -81,6 +89,16 @@
         reader.readAsDataURL(file);
       }
     });
+
+    // Escuta mudanças de auth
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        window.location.href = '../';
+      }
+    });
+
+    // Executa ao carregar
+    checkAuth();
   </script>
 
 </body>
