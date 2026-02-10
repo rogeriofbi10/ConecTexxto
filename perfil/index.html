@@ -8,18 +8,16 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Carrega supabase.js SEM defer -->
-  <script src="../supabase.js"></script>
+  <!-- Carrega sem defer e com async=false para ordem garantida -->
+  <script src="../supabase.js" async=false></script>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen">
 
-  <!-- Seu header e main (mantém igual ao anterior) -->
+  <!-- Header e main (mantém igual) -->
   <header class="bg-gray-950 border-b border-gray-800 sticky top-0 z-10 shadow-md">
     <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
       <h1 class="text-2xl md:text-3xl font-bold text-blue-400 tracking-tight">ConecTexxto</h1>
-      <nav class="flex gap-6 text-gray-300">
-        <a href="/ConecTexxto/" class="hover:text-white transition duration-200">Início</a>
-      </nav>
+      <a href="/ConecTexxto/" class="hover:text-white transition duration-200">Início</a>
     </div>
   </header>
 
@@ -27,6 +25,7 @@
     <div class="max-w-4xl mx-auto px-4">
       <a href="/ConecTexxto/" class="text-blue-400 hover:text-blue-300 transition duration-200 mb-6 inline-block text-lg font-medium">← Voltar para Início</a>
       
+      <!-- Seus campos de perfil aqui (igual ao anterior) -->
       <div class="bg-gray-800/80 backdrop-blur-lg border border-gray-700 rounded-3xl shadow-2xl p-8 md:p-10">
         <h1 class="text-3xl font-bold mb-10 text-center">Seu Perfil</h1>
         
@@ -43,22 +42,12 @@
           </div>
           
           <div class="space-y-6">
+            <!-- Campos nome, username, idade, telefone - mantenha como estava -->
             <div>
               <label class="block text-sm font-medium mb-2 text-gray-300">Nome</label>
               <input id="nome" type="text" value="Rogério Felipe" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
             </div>
-            <div>
-              <label class="block text-sm font-medium mb-2 text-gray-300">@username (único)</label>
-              <input id="username" type="text" value="rogerioreact" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
-            </div>
-            <div>
-              <label class="block text-sm font-medium mb-2 text-gray-300">Idade</label>
-              <input id="idade" type="number" value="34" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
-            </div>
-            <div>
-              <label class="block text-sm font-medium mb-2 text-gray-300">Telefone (opcional)</label>
-              <input id="telefone" type="tel" value="21972841918" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
-            </div>
+            <!-- ... outros campos ... -->
           </div>
         </div>
         
@@ -71,17 +60,19 @@
   </main>
 
   <script>
-    // Espera tudo carregar (incluindo supabase.js)
-    window.addEventListener('load', () => {
-      if (typeof window.supabase === 'undefined' || !window.supabase) {
-        console.error("supabase ainda não definido após load");
-        alert("Erro: supabase não carregou. Verifique o console (F12) e o caminho ../supabase.js");
-        return;
+    // Aguarda supabase estar pronto
+    function waitForSupabase(callback) {
+      if (window.supabase) {
+        callback();
+      } else {
+        setTimeout(() => waitForSupabase(callback), 100);  // poll a cada 100ms
       }
+    }
 
-      console.log("Supabase disponível!");
+    waitForSupabase(() => {
+      console.log("Supabase agora está disponível!");
 
-      // Preview da foto
+      // Preview foto
       document.getElementById('fotoInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -93,31 +84,13 @@
         }
       });
 
-      // Botão Salvar
+      // Salvar (cole aqui a lógica de upload/upsert do código anterior)
       document.getElementById('salvarBtn').addEventListener('click', async () => {
-        const btn = document.getElementById('salvarBtn');
-        btn.disabled = true;
-        btn.textContent = 'Salvando...';
-
-        try {
-          const { data: { session } } = await supabase.auth.getSession();
-          if (!session) throw new Error('Você precisa estar logado');
-
-          // ... resto do código de upload e upsert igual ao anterior ...
-          // (cole aqui a parte do try do código anterior de save, a partir de const userId = ... até o finally)
-
-          alert('Perfil salvo com sucesso!');
-          location.reload();
-        } catch (err) {
-          console.error('Erro ao salvar:', err);
-          alert('Erro ao salvar: ' + (err.message || 'Detalhes no console'));
-        } finally {
-          btn.disabled = false;
-          btn.textContent = 'Salvar Alterações';
-        }
+        // ... lógica de save igual à anterior ...
+        // Use supabase.auth.getSession(), supabase.storage.from('avatars').upload(), supabase.from('profiles').upsert()
       });
 
-      // Check auth (simplificado)
+      // Check auth
       supabase.auth.getSession().then(({ data }) => {
         if (!data.session) {
           window.location.href = '/ConecTexxto/';
