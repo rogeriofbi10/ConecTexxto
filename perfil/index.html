@@ -7,9 +7,16 @@
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CDN do Supabase JS v2 -->
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+    window.createSupabaseClient = createClient;
+  </script>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen font-sans">
 
+  <!-- Seu header e main (igual ao anterior, com todos os campos) -->
   <header class="bg-gray-950 border-b border-gray-800 sticky top-0 z-10 shadow-md">
     <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
       <h1 class="text-2xl md:text-3xl font-bold text-blue-400 tracking-tight">ConecTexxto</h1>
@@ -25,7 +32,6 @@
         <h1 class="text-3xl font-bold mb-10 text-center">Seu Perfil</h1>
         
         <div class="grid md:grid-cols-2 gap-10">
-          <!-- Foto -->
           <div class="flex flex-col items-center space-y-6">
             <div class="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden border-4 border-blue-500 shadow-2xl hover:scale-105 transition duration-300">
               <img id="preview" src="https://via.placeholder.com/300?text=Carregue+sua+foto" alt="Foto de perfil" class="w-full h-full object-cover">
@@ -34,10 +40,9 @@
               Escolher foto (JPG/PNG)
               <input type="file" accept="image/jpeg,image/png" id="fotoInput" class="hidden">
             </label>
-            <p class="text-sm text-gray-400 text-center">Prévia aparece imediatamente. Clique em Salvar para tentar enviar.</p>
+            <p class="text-sm text-gray-400 text-center">Prévia aparece imediatamente. Clique em Salvar para enviar.</p>
           </div>
           
-          <!-- Campos -->
           <div class="space-y-6">
             <div>
               <label class="block text-sm font-medium mb-2 text-gray-300">Nome</label>
@@ -67,7 +72,7 @@
   </main>
 
   <script>
-    // Preview da foto - sempre funciona
+    // Preview foto
     document.getElementById('fotoInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -79,56 +84,66 @@
       }
     });
 
-    // Salvar - cria client dentro do clique
+    // Salvar
     document.getElementById('salvarBtn').addEventListener('click', async () => {
       const btn = document.getElementById('salvarBtn');
       btn.disabled = true;
       btn.innerText = 'Salvando...';
 
       try {
-        // Cria client Supabase diretamente aqui (sem depender de arquivo externo)
-        const supabaseUrl = "https://peoinxkkmeemlmgpugbv.supabase.co";
-        const supabaseKey = "sb_publishable_Wp8oZnHe8C9EdwJdV3satw_NF6KXdk4";  // anon key
+        // Cria o client usando o import do CDN
+        const { createClient } = window.supabase;  // ou use await import se necessário
+        const supabase = createClient(
+          "https://peoinxkkmeemlmgpugbv.supabase.co",
+          "sb_publishable_Wp8oZnHe8C9EdwJdV3satw_NF6KXdk4"
+        );
 
-        // Função createClient inline (simplificada do Supabase JS)
-        const supabase = {
-          auth: {
-            getSession: async () => ({ data: { session: null } })  // placeholder - substitua pela lógica real se souber
-          },
-          storage: {
-            from: (bucket) => ({
-              upload: async (path, file, options) => {
-                alert("Upload simulado - implemente o client real aqui");
-                return { error: null };
-              },
-              getPublicUrl: (path) => ({ data: { publicUrl: "https://exemplo.com/imagem.jpg" } })
-            })
-          },
-          from: (table) => ({
-            upsert: async (data, options) => {
-              alert("Upsert simulado no banco - implemente o client real");
-              return { error: null };
-            }
-          })
-        };
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (!session) throw new Error('Sessão não encontrada. Faça login novamente.');
 
-        // Aqui você coloca o client real quando funcionar
-        // Exemplo com CDN completo (se quiser testar):
-        // const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
-        // const supabase = createClient(supabaseUrl, supabaseKey);
+        // Resto do código de upload e upsert (igual ao anterior)
+        const userId = session.user.id;
+        const nome = document.getElementById('nome').value.trim();
+        const username = document.getElementById('username').value.trim();
+        const idade = parseInt(document.getElementById('idade').value) || null;
+        const telefone = document.getElementById('telefone').value.trim() || null;
+        const fileInput = document.getElementById('fotoInput');
+        let avatarUrl = null;
 
-        // Teste simples: se chegou aqui, o problema era o load
-        alert("Chegou no try - Supabase criado! Agora veja o console para mais.");
+        if (fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          const fileExt = file.name.split('.').pop();
+          const filePath = `profiles/${userId}.${fileExt}`;
 
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) throw new Error('Não logado - teste local');
+          const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(filePath, file, { upsert: true });
 
-        // Resto do código de upload e upsert...
-        alert('Teste OK - implemente o client real para salvar de verdade');
+          if (uploadError) throw uploadError;
 
+          const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+          avatarUrl = urlData.publicUrl;
+        }
+
+        const { error } = await supabase
+          .from('profiles')
+          .upsert({
+            user_id: userId,
+            full_name: nome,
+            username,
+            age: idade,
+            phone: telefone,
+            avatar_url: avatarUrl || undefined
+          }, { onConflict: 'user_id' });
+
+        if (error) throw error;
+
+        alert('Perfil salvo com sucesso!');
+        location.reload();
       } catch (err) {
-        console.error('Erro ao salvar:', err);
-        alert('Erro ao salvar: ' + err.message);
+        console.error('Erro completo:', err);
+        alert('Erro ao salvar: ' + (err.message || 'Verifique o console (F12)'));
       } finally {
         btn.disabled = false;
         btn.innerText = 'Salvar Alterações';
