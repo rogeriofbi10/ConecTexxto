@@ -8,16 +8,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Carrega sem defer e com async=false para ordem garantida -->
-  <script src="../supabase.js" async=false></script>
+  <!-- Carrega supabase.js SEM defer -->
+  <script src="../supabase.js"></script>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen">
+<body class="bg-gray-950 text-gray-100 min-h-screen font-sans">
 
-  <!-- Header e main (mantém igual) -->
   <header class="bg-gray-950 border-b border-gray-800 sticky top-0 z-10 shadow-md">
     <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
       <h1 class="text-2xl md:text-3xl font-bold text-blue-400 tracking-tight">ConecTexxto</h1>
-      <a href="/ConecTexxto/" class="hover:text-white transition duration-200">Início</a>
+      <a href="/ConecTexxto/" class="text-gray-300 hover:text-white transition duration-200">Início</a>
     </div>
   </header>
 
@@ -25,33 +24,44 @@
     <div class="max-w-4xl mx-auto px-4">
       <a href="/ConecTexxto/" class="text-blue-400 hover:text-blue-300 transition duration-200 mb-6 inline-block text-lg font-medium">← Voltar para Início</a>
       
-      <!-- Seus campos de perfil aqui (igual ao anterior) -->
       <div class="bg-gray-800/80 backdrop-blur-lg border border-gray-700 rounded-3xl shadow-2xl p-8 md:p-10">
-        <h1 class="text-3xl font-bold mb-10 text-center">Seu Perfil</h1>
+        <h1 class="text-3xl font-bold mb-8 text-center">Seu Perfil</h1>
         
-        <div class="grid md:grid-cols-2 gap-10">
-          <div class="flex flex-col items-center space-y-6">
-            <div class="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden border-4 border-blue-500 shadow-2xl hover:scale-105 transition duration-300">
-              <img id="preview" src="https://via.placeholder.com/300?text=Carregue+sua+foto" alt="Foto de perfil" class="w-full h-full object-cover">
+        <div class="grid md:grid-cols-2 gap-8">
+          <!-- Foto -->
+          <div class="flex flex-col items-center space-y-4">
+            <div class="w-48 h-48 rounded-2xl overflow-hidden border-4 border-blue-500 shadow-xl">
+              <img id="preview" src="https://via.placeholder.com/300?text=Clique+para+carregar" alt="Foto de perfil" class="w-full h-full object-cover">
             </div>
             <label class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-xl cursor-pointer transition duration-300 shadow-md text-center w-full max-w-xs">
               Escolher foto (JPG/PNG)
               <input type="file" accept="image/jpeg,image/png" id="fotoInput" class="hidden">
             </label>
-            <p class="text-sm text-gray-400 text-center">Prévia aparece imediatamente. Clique em Salvar para enviar.</p>
+            <p class="text-sm text-gray-400 text-center">Prévia aparece aqui. Salve para enviar ao servidor.</p>
           </div>
           
+          <!-- Campos -->
           <div class="space-y-6">
-            <!-- Campos nome, username, idade, telefone - mantenha como estava -->
             <div>
               <label class="block text-sm font-medium mb-2 text-gray-300">Nome</label>
               <input id="nome" type="text" value="Rogério Felipe" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
             </div>
-            <!-- ... outros campos ... -->
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-300">@username (único)</label>
+              <input id="username" type="text" value="rogerioreact" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-300">Idade</label>
+              <input id="idade" type="number" value="34" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2 text-gray-300">Telefone (opcional)</label>
+              <input id="telefone" type="tel" value="21972841918" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+            </div>
           </div>
         </div>
         
-        <div class="mt-12 flex justify-end gap-4">
+        <div class="mt-10 flex justify-end gap-4">
           <button onclick="history.back()" class="bg-gray-700 hover:bg-gray-600 px-8 py-3 rounded-xl transition duration-300">Voltar</button>
           <button id="salvarBtn" class="bg-blue-600 hover:bg-blue-700 px-10 py-3 rounded-xl font-medium transition duration-300 shadow-lg">Salvar Alterações</button>
         </div>
@@ -60,19 +70,19 @@
   </main>
 
   <script>
-    // Aguarda supabase estar pronto
+    // Função para esperar supabase estar pronto
     function waitForSupabase(callback) {
       if (window.supabase) {
         callback();
       } else {
-        setTimeout(() => waitForSupabase(callback), 100);  // poll a cada 100ms
+        setTimeout(() => waitForSupabase(callback), 200);
       }
     }
 
     waitForSupabase(() => {
-      console.log("Supabase agora está disponível!");
+      console.log("Supabase carregado com sucesso!");
 
-      // Preview foto
+      // Preview da foto
       document.getElementById('fotoInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -84,16 +94,62 @@
         }
       });
 
-      // Salvar (cole aqui a lógica de upload/upsert do código anterior)
+      // Botão Salvar
       document.getElementById('salvarBtn').addEventListener('click', async () => {
-        // ... lógica de save igual à anterior ...
-        // Use supabase.auth.getSession(), supabase.storage.from('avatars').upload(), supabase.from('profiles').upsert()
-      });
+        const btn = document.getElementById('salvarBtn');
+        btn.disabled = true;
+        btn.innerText = 'Salvando...';
 
-      // Check auth
-      supabase.auth.getSession().then(({ data }) => {
-        if (!data.session) {
-          window.location.href = '/ConecTexxto/';
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session) throw new Error('Você precisa estar logado');
+
+          const userId = session.user.id;
+          const nome = document.getElementById('nome').value.trim();
+          const username = document.getElementById('username').value.trim();
+          const idade = parseInt(document.getElementById('idade').value) || null;
+          const telefone = document.getElementById('telefone').value.trim() || null;
+          const fileInput = document.getElementById('fotoInput');
+          let avatarUrl = null;
+
+          // Upload foto
+          if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const fileExt = file.name.split('.').pop();
+            const filePath = `profiles/${userId}.${fileExt}`;
+
+            const { error: uploadError } = await supabase.storage
+              .from('avatars')
+              .upload(filePath, file, { upsert: true });
+
+            if (uploadError) throw uploadError;
+
+            const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+            avatarUrl = urlData.publicUrl;
+          }
+
+          // Salvar dados no banco
+          const { error } = await supabase
+            .from('profiles')
+            .upsert({
+              user_id: userId,
+              full_name: nome,
+              username,
+              age: idade,
+              phone: telefone,
+              avatar_url: avatarUrl
+            }, { onConflict: 'user_id' });
+
+          if (error) throw error;
+
+          alert('Perfil salvo com sucesso!');
+          location.reload();  // Atualiza para mostrar nova foto se for do banco
+        } catch (err) {
+          console.error('Erro ao salvar:', err);
+          alert('Erro ao salvar: ' + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.innerText = 'Salvar Alterações';
         }
       });
     });
