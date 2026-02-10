@@ -26,7 +26,6 @@
 
   <main class="bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 min-h-screen py-10">
     <div class="max-w-4xl mx-auto px-4">
-      <!-- Link corrigido com href absoluto -->
       <a href="/ConecTexxto/" class="text-blue-400 hover:text-blue-300 transition duration-200 mb-6 inline-block text-lg font-medium">← Voltar para Início</a>
       
       <div class="bg-gray-800/80 backdrop-blur-lg border border-gray-700 rounded-3xl shadow-2xl p-8 md:p-10">
@@ -41,45 +40,39 @@
               Escolher foto (JPG/PNG)
               <input type="file" accept="image/jpeg,image/png" id="fotoInput" class="hidden">
             </label>
-            <p class="text-sm text-gray-400 text-center">Prévia aparece imediatamente ao selecionar.</p>
+            <p class="text-sm text-gray-400 text-center">Prévia aparece imediatamente. Clique em Salvar para enviar.</p>
           </div>
           
           <div class="space-y-6">
             <div>
               <label class="block text-sm font-medium mb-2 text-gray-300">Nome</label>
-              <input type="text" value="Rogério Felipe" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+              <input id="nome" type="text" value="Rogério Felipe" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
             </div>
             <div>
               <label class="block text-sm font-medium mb-2 text-gray-300">@username (único)</label>
-              <input type="text" value="rogerioreact" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+              <input id="username" type="text" value="rogerioreact" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
             </div>
             <div>
               <label class="block text-sm font-medium mb-2 text-gray-300">Idade</label>
-              <input type="number" value="34" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+              <input id="idade" type="number" value="34" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
             </div>
             <div>
               <label class="block text-sm font-medium mb-2 text-gray-300">Telefone (opcional)</label>
-              <input type="tel" value="21972841918" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+              <input id="telefone" type="tel" value="21972841918" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
             </div>
           </div>
         </div>
         
         <div class="mt-12 flex justify-end gap-4">
           <button onclick="history.back()" class="bg-gray-700 hover:bg-gray-600 px-8 py-3 rounded-xl transition duration-300">Voltar</button>
-          <button class="bg-blue-600 hover:bg-blue-700 px-10 py-3 rounded-xl font-medium transition duration-300 shadow-lg">Salvar Alterações</button>
+          <button id="salvarBtn" class="bg-blue-600 hover:bg-blue-700 px-10 py-3 rounded-xl font-medium transition duration-300 shadow-lg">Salvar Alterações</button>
         </div>
       </div>
     </div>
   </main>
 
   <script>
-    async function checkAuth() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        window.location.href = '/ConecTexxto/';
-      }
-    }
-
+    // Preview foto local
     document.getElementById('fotoInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -90,6 +83,75 @@
         reader.readAsDataURL(file);
       }
     });
+
+    // Salvar perfil (foto + dados)
+    document.getElementById('salvarBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('salvarBtn');
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('Não logado');
+
+        const userId = session.user.id;
+        const nome = document.getElementById('nome').value.trim();
+        const username = document.getElementById('username').value.trim();
+        const idade = parseInt(document.getElementById('idade').value);
+        const telefone = document.getElementById('telefone').value.trim();
+        const fileInput = document.getElementById('fotoInput');
+        let avatarUrl = null;
+
+        // Upload foto se selecionada
+        if (fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${userId}.${fileExt}`;
+          const filePath = `profiles/${fileName}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(filePath, file, { upsert: true });
+
+          if (uploadError) throw uploadError;
+
+          const { data: publicUrl } = supabase.storage.from('avatars').getPublicUrl(filePath);
+          avatarUrl = publicUrl.publicUrl;
+        }
+
+        // Atualiza ou insere no banco
+        const { error } = await supabase
+          .from('profiles')
+          .upsert({
+            user_id: userId,
+            full_name: nome,
+            username,
+            age: idade,
+            phone: telefone,
+            avatar_url: avatarUrl || undefined  // só atualiza se mudou
+          }, { onConflict: 'user_id' });
+
+        if (error) throw error;
+
+        alert('Perfil salvo com sucesso!');
+        // Opcional: recarregar para mostrar foto nova do banco
+        location.reload();
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao salvar: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Salvar Alterações';
+      }
+    });
+
+    // Verifica login
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/ConecTexxto/';
+      }
+    }
 
     supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
