@@ -67,6 +67,7 @@
   <script type="module">
     import { supabase } from "../supabase.js";
 
+    // Preview imediato da foto
     document.getElementById('fotoInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -78,6 +79,7 @@
       }
     });
 
+    // Salvar perfil + foto
     document.getElementById('salvarBtn').addEventListener('click', async () => {
       const btn = document.getElementById('salvarBtn');
       btn.disabled = true;
@@ -85,7 +87,7 @@
 
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session) throw new Error('Você precisa estar logado.');
+        if (!session) throw new Error('Você precisa estar logado. Faça login novamente.');
 
         const userId = session.user.id;
         const nome = document.getElementById('nome').value.trim();
@@ -95,6 +97,7 @@
         const fileInput = document.getElementById('fotoInput');
         let avatarUrl = null;
 
+        // Upload foto
         if (fileInput.files.length > 0) {
           const file = fileInput.files[0];
           const fileExt = file.name.split('.').pop();
@@ -110,13 +113,14 @@
           avatarUrl = urlData.publicUrl + `?t=${Date.now()}`;
         }
 
+        // Salva dados (usando nomes exatos das colunas)
         const { error } = await supabase
           .from('profiles')
           .upsert({
             user_id: userId,
-            nome,  // nome correto da coluna
+            nome,
             username,
-            idade,  // nome correto da coluna
+            idade,
             telefone,
             avatar_url: avatarUrl || undefined
           }, { onConflict: 'user_id' });
@@ -124,7 +128,7 @@
         if (error) throw error;
 
         alert('Perfil salvo com sucesso!');
-        location.reload();
+        location.reload(); // Recarrega para mostrar foto nova
       } catch (err) {
         console.error('Erro ao salvar:', err);
         alert('Erro ao salvar: ' + err.message);
