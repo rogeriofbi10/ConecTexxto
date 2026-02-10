@@ -11,6 +11,7 @@
   <!-- Fonte Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
+  <!-- Supabase (ajuste path se necessário) -->
   <script src="../supabase.js" defer></script>
   
   <style>
@@ -19,36 +20,32 @@
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen">
 
-  <!-- Header -->
   <header class="bg-gray-950 border-b border-gray-800 sticky top-0 z-10 shadow-md">
     <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
       <h1 class="text-2xl md:text-3xl font-bold text-blue-400 tracking-tight">ConecTexxto</h1>
-      <a href="/" class="text-gray-300 hover:text-white transition duration-200">Início</a>
+      <a href="../" class="text-gray-300 hover:text-white transition duration-200">Início</a>
     </div>
   </header>
 
-  <!-- Main -->
   <main class="bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 min-h-screen py-10">
     <div class="max-w-4xl mx-auto px-4">
-      <a href="/" class="text-blue-400 hover:text-blue-300 transition duration-200 mb-6 inline-block text-lg font-medium">← Voltar</a>
+      <a href="../" class="text-blue-400 hover:text-blue-300 transition duration-200 mb-6 inline-block text-lg font-medium">← Voltar para Início</a>
       
       <div class="bg-gray-800/80 backdrop-blur-lg border border-gray-700 rounded-3xl shadow-2xl p-8 md:p-10">
         <h1 class="text-3xl font-bold mb-10 text-center">Seu Perfil</h1>
         
         <div class="grid md:grid-cols-2 gap-10">
-          <!-- Foto -->
           <div class="flex flex-col items-center space-y-6">
             <div class="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden border-4 border-blue-500 shadow-2xl hover:scale-105 transition duration-300">
-              <img id="preview" src="https://via.placeholder.com/300?text=Sua+Foto" alt="Foto de perfil" class="w-full h-full object-cover">
+              <img id="preview" src="https://via.placeholder.com/300?text=Carregue+sua+foto" alt="Foto de perfil" class="w-full h-full object-cover">
             </div>
             <label class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-xl cursor-pointer transition duration-300 shadow-md text-center w-full max-w-xs">
               Escolher foto (JPG/PNG)
               <input type="file" accept="image/jpeg,image/png" id="fotoInput" class="hidden">
             </label>
-            <p class="text-sm text-gray-400 text-center">Prévia aparece ao escolher. Salve para enviar.</p>
+            <p class="text-sm text-gray-400 text-center">Prévia aparece imediatamente ao selecionar.</p>
           </div>
           
-          <!-- Campos -->
           <div class="space-y-6">
             <div>
               <label class="block text-sm font-medium mb-2 text-gray-300">Nome</label>
@@ -77,7 +74,6 @@
     </div>
   </main>
 
-  <!-- Preview foto -->
   <script>
     document.getElementById('fotoInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
