@@ -69,7 +69,7 @@
   <script type="module">
     import { supabase } from "../supabase.js";
 
-    // Preview imediato (local, funciona sempre)
+    // Preview imediato da foto
     document.getElementById('fotoInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -81,7 +81,7 @@
       }
     });
 
-    // Salvar (foto + dados)
+    // Salvar tudo
     document.getElementById('salvarBtn').addEventListener('click', async () => {
       const btn = document.getElementById('salvarBtn');
       btn.disabled = true;
@@ -89,7 +89,7 @@
 
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session) throw new Error('Não está logado. Faça login novamente.');
+        if (!session) throw new Error('Você precisa estar logado. Faça login novamente.');
 
         const userId = session.user.id;
         const nome = document.getElementById('nome').value.trim();
@@ -99,7 +99,7 @@
         const fileInput = document.getElementById('fotoInput');
         let avatarUrl = null;
 
-        // Upload foto se escolhida
+        // Upload da foto
         if (fileInput.files.length > 0) {
           const file = fileInput.files[0];
           const fileExt = file.name.split('.').pop();
@@ -112,10 +112,10 @@
           if (uploadError) throw uploadError;
 
           const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
-          avatarUrl = urlData.publicUrl + `?t=${Date.now()}`; // evita cache antigo
+          avatarUrl = urlData.publicUrl + `?t=${Date.now()}`;
         }
 
-        // Salva dados
+        // Salva dados no banco
         const { error } = await supabase
           .from('profiles')
           .upsert({
@@ -130,10 +130,10 @@
         if (error) throw error;
 
         alert('Perfil e foto salvos com sucesso!');
-        location.reload(); // Mostra a foto nova
+        location.reload(); // Atualiza para mostrar a foto nova
       } catch (err) {
         console.error('Erro ao salvar:', err);
-        alert('Erro ao salvar: ' + (err.message || 'Verifique console (F12)'));
+        alert('Erro ao salvar: ' + (err.message || 'Verifique o console (F12)'));
       } finally {
         btn.disabled = false;
         btn.innerText = 'Salvar Alterações';
